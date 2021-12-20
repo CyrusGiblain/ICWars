@@ -13,6 +13,9 @@ public abstract class ICWarsArea extends Area {
     public final float getCameraScaleFactor(){return 10.f;}
 
     public abstract DiscreteCoordinates getPlayerSpawnPosition();
+    public abstract DiscreteCoordinates getEnemySpawnPosition();
+    //public abstract DiscreteCoordinates getEnemySpawnPosition2();
+    //public abstract DiscreteCoordinates getEnemySpawnPosition3();
 
     public boolean begin(Window window, FileSystem fileSystem) {
         if (super.begin(window, fileSystem)) {

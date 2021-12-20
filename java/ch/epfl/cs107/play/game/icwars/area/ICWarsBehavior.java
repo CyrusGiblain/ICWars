@@ -4,6 +4,7 @@ import ch.epfl.cs107.play.game.areagame.AreaBehavior;
 import ch.epfl.cs107.play.game.areagame.actor.Interactable;
 import ch.epfl.cs107.play.game.areagame.actor.Interactor;
 import ch.epfl.cs107.play.game.areagame.handler.AreaInteractionVisitor;
+import ch.epfl.cs107.play.game.icwars.handler.ICWarsInteractionVisitor;
 import ch.epfl.cs107.play.window.Window;
 
 public class ICWarsBehavior extends AreaBehavior {
@@ -103,7 +104,7 @@ public class ICWarsBehavior extends AreaBehavior {
 
         @Override
         public void acceptInteraction(AreaInteractionVisitor v) {
-
+            (ICWarsInteractionVisitor)v.interactWith(this);
         }
     }
 }

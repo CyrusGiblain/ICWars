@@ -166,4 +166,12 @@ public class ICWarsPlayer extends ICWarsActor implements Interactor {
     public Unit getSelectedUnit() {
         return selectedUnit;
     }
+
+    public ICWarsPlayerCurrentState getCurrentState() {
+        return currentState;
+    }
+
+    public List<Unit> getUnits() {
+        return units;
+    }
 }

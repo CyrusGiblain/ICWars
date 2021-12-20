@@ -12,6 +12,8 @@ import ch.epfl.cs107.play.math.DiscreteCoordinates;
 import ch.epfl.cs107.play.window.Button;
 import ch.epfl.cs107.play.window.Canvas;
 import ch.epfl.cs107.play.window.Keyboard;
+
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
@@ -20,9 +22,9 @@ public class RealPlayer extends ICWarsPlayer {
     private float hp;
     private Sprite sprite;
     private String spriteName;
-    protected List<Unit> memory = Collections.emptyList();
+    protected List<Unit> memory;
     private ICWarsPlayerGUI icWarsPlayerGUI;
-    private boolean theUnitIsUsed;
+    private boolean theSelectedUnitHasBeenUsed = false;
     /// Animation duration in frame number
     private final static int MOVE_DURATION = 8;
     /**
@@ -37,7 +39,7 @@ public class RealPlayer extends ICWarsPlayer {
             spriteName = "icwars/enemyCursor";
         }
         sprite = new Sprite(spriteName, 1.f, 1.f,this);
-        this.icWarsPlayerGUI = new ICWarsPlayerGUI(1.0f, this); // @toDO : change the scale factor
+        this.icWarsPlayerGUI = new ICWarsPlayerGUI(1.0f, this);
         resetMotion();
     }
 
@@ -61,7 +63,6 @@ public class RealPlayer extends ICWarsPlayer {
         switch (currentState) {
 
             case IDLE:
-                currentState = ICWarsPlayerCurrentState.NORMAL;
                 break;
 
             case NORMAL:
@@ -70,10 +71,10 @@ public class RealPlayer extends ICWarsPlayer {
 
                 centerCamera();
 
-                if (enter.isDown()) {
+                if (enter.isReleased()) {
                     currentState = ICWarsPlayerCurrentState.SELECT_CELL;
                 }
-                if (tab.isDown()) {
+                if (tab.isReleased()) {
                     currentState = ICWarsPlayerCurrentState.IDLE;
                 }
                 break;
@@ -82,19 +83,22 @@ public class RealPlayer extends ICWarsPlayer {
 
                 canMove();
 
-                if (selectedUnit != null) {
-                    memory.add(selectedUnit);
-                    currentState = ICWarsPlayerCurrentState.MOVE_UNIT;
-                }else{
-                    currentState = ICWarsPlayerCurrentState.NORMAL;
+                if (!selectedUnit.theUnitHasBeenUsed()) {
+                    if (selectedUnit != null) {
+                        currentState = ICWarsPlayerCurrentState.MOVE_UNIT;
+                    } else {
+                        currentState = ICWarsPlayerCurrentState.NORMAL;
+                    }
                 }
+
                 break;
 
             case MOVE_UNIT:
 
                 canMove();
 
-                if (enter.isDown()) {
+                if (enter.isReleased()) {
+                    selectedUnit.changePosition(getCurrentMainCellCoordinates());
                     currentState = ICWarsPlayerCurrentState.NORMAL;
                 }
                 break;
@@ -202,6 +206,7 @@ public class RealPlayer extends ICWarsPlayer {
         ((ICWarsInteractionVisitor)v).interactWith(this); }
 
     public void canMove() {
+        
 
         Keyboard keyboard2 = getOwnerArea().getKeyboard();
 
@@ -221,10 +226,8 @@ public class RealPlayer extends ICWarsPlayer {
 
         @Override
         public void interactWith(Unit unit) {
-            System.out.println("interactionWithUnit");
-            if (getCamp().equals(unit.getCamp())) {
+            if (getCamp().equals(unit.getCamp()) && currentState == ICWarsPlayerCurrentState.SELECT_CELL) {
                 selectedUnit = unit;
-                // Rajouter le graphisme.
             }
         }
     }

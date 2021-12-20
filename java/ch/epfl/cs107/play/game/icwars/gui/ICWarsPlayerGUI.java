@@ -12,6 +12,8 @@ import java.util.Objects;
 public class ICWarsPlayerGUI implements Graphics {
 
     protected ICWarsPlayer player;
+    ICWarsActionsPanel panel;
+    protected static final int FONT_SIZE = 13;
 
     public ICWarsPlayerGUI(float cameraScaleFactor, ICWarsPlayer player) {
         this.player = player;
@@ -29,6 +31,9 @@ public class ICWarsPlayerGUI implements Graphics {
         Unit selected = player.getSelectedUnit();
         if(selected != null){
             selected.drawRangeAndPathTo(destination, canvas);
+
+            if(player.getCurrentState() == ICWarsPlayer.ICWarsPlayerCurrentState.ACTION_SELECTION)
+                panel.setActions(player.getSelectedUnit().getPossibleActions());
         }
     }
 }
