@@ -5,7 +5,16 @@ import ch.epfl.cs107.play.game.areagame.actor.Interactable;
 import ch.epfl.cs107.play.game.areagame.actor.Orientation;
 import ch.epfl.cs107.play.game.areagame.actor.Sprite;
 import ch.epfl.cs107.play.game.areagame.handler.AreaInteractionVisitor;
+import ch.epfl.cs107.play.game.icwars.actor.Soldats;
+import ch.epfl.cs107.play.game.icwars.actor.Tanks;
 import ch.epfl.cs107.play.game.icwars.actor.Unit;
+import ch.epfl.cs107.play.game.icwars.actor.unit.Action;
+import ch.epfl.cs107.play.game.icwars.actor.unit.Attack;
+import ch.epfl.cs107.play.game.icwars.actor.unit.Wait;
+import ch.epfl.cs107.play.game.icwars.area.ICWarsArea;
+import ch.epfl.cs107.play.game.icwars.area.ICWarsBehavior;
+import ch.epfl.cs107.play.game.icwars.gui.ICWarsActionsPanel;
+import ch.epfl.cs107.play.game.icwars.gui.ICWarsInfoPanel;
 import ch.epfl.cs107.play.game.icwars.gui.ICWarsPlayerGUI;
 import ch.epfl.cs107.play.game.icwars.handler.ICWarsInteractionVisitor;
 import ch.epfl.cs107.play.math.DiscreteCoordinates;
@@ -13,10 +22,8 @@ import ch.epfl.cs107.play.window.Button;
 import ch.epfl.cs107.play.window.Canvas;
 import ch.epfl.cs107.play.window.Keyboard;
 
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.Objects;
 
 public class RealPlayer extends ICWarsPlayer {
     private float hp;
@@ -27,12 +34,18 @@ public class RealPlayer extends ICWarsPlayer {
     private boolean theSelectedUnitHasBeenUsed = false;
     /// Animation duration in frame number
     private final static int MOVE_DURATION = 8;
+    private ICWarsArea area;
+    private Action actToExecute;
+    ICWarsInfoPanel ICWarsInfoPanel;
+    ICWarsActionsPanel panel;
+    ICWarsBehavior.ICWarsCellType cellType ;
     /**
      * Demo actor
      *
      */
-    public RealPlayer(Area owner, DiscreteCoordinates position, faction camp, Unit... units) {
+    public RealPlayer(ICWarsArea owner, DiscreteCoordinates position, faction camp, Unit... units) {
         super(owner, position, camp, units);
+        this.area = owner;
         if (camp == faction.ALLIE) {
             spriteName = "icwars/allyCursor";
         } else {
@@ -55,10 +68,14 @@ public class RealPlayer extends ICWarsPlayer {
 
         super.update(deltaTime);
 
+        System.out.println(currentState);
+
         Keyboard keyboard1= getOwnerArea().getKeyboard();
 
         Button enter = keyboard1.get(Keyboard.ENTER);
         Button tab = keyboard1.get(Keyboard.TAB);
+        Button A = keyboard1.get(Keyboard.A);
+        Button W = keyboard1.get(Keyboard.W);
 
         switch (currentState) {
 
@@ -72,7 +89,12 @@ public class RealPlayer extends ICWarsPlayer {
                 centerCamera();
 
                 if (enter.isReleased()) {
-                    currentState = ICWarsPlayerCurrentState.SELECT_CELL;
+                    for (Unit unit : this.getUnits()) {
+                       if (unit.getCurrentCells().equals(this.getCurrentCells())) {
+                           currentState = ICWarsPlayerCurrentState.SELECT_CELL;
+                       }
+
+                   }
                 }
                 if (tab.isReleased()) {
                     currentState = ICWarsPlayerCurrentState.IDLE;
@@ -95,20 +117,54 @@ public class RealPlayer extends ICWarsPlayer {
 
             case MOVE_UNIT:
 
-                canMove();
+                canMoveOnlyInTheRange();
 
                 if (enter.isReleased()) {
                     selectedUnit.changePosition(getCurrentMainCellCoordinates());
+                    //currentState = ICWarsPlayerCurrentState.NORMAL;
+                    if (selectedUnit.theUnitHasBeenUsed()) {
+                        currentState = ICWarsPlayerCurrentState.ACTION_SELECTION;
+                    }
+                }
+
+                if (tab.isReleased()) {
                     currentState = ICWarsPlayerCurrentState.NORMAL;
                 }
                 break;
 
             case ACTION_SELECTION:
-                // Rien pour l'instant
+                if (selectedUnit instanceof Tanks) {
+                    for (int i = 0; i < selectedUnit.getPossibleActions().size(); ++i) {
+                        Action action = selectedUnit.getPossibleActions().get(i);
+                        if (A.isReleased()) {
+                            System.out.println(" A SELECTIONNEE");
+                            actToExecute = new Attack(this.getSelectedUnit(), this.area);
+                            currentState = ICWarsPlayerCurrentState.ACTION;
+                        } else if (W.isReleased()) {
+                            System.out.println(("W SELECTIONNEE"));
+                            actToExecute = new Wait(this.getSelectedUnit(), this.area);
+                            currentState = ICWarsPlayerCurrentState.NORMAL;
+                        }
+
+
+                    }
+                } else if (selectedUnit instanceof Soldats) {
+                    for (Action act : ((Soldats) selectedUnit).getPossibleActions()) {
+                        if (W.isReleased()) {
+                            currentState = ICWarsPlayerCurrentState.ACTION;
+                            if (act instanceof Attack) {
+                                actToExecute = new Attack(this.getSelectedUnit(), this.area);
+                            } else {
+                                actToExecute = new Wait(this.getSelectedUnit(), this.area);
+                            }
+                        }
+                    }
+            }
                 break;
 
             case ACTION:
-                // Rien pour l'instant
+                float dt = 0;
+               actToExecute.doAction(dt, this, keyboard1);
                 break;
 
         }
@@ -118,7 +174,7 @@ public class RealPlayer extends ICWarsPlayer {
      * @param orientation (Orientation): given orientation, not null
      * @param b (Button): button corresponding to the given orientation, not null
      */
-    private void moveIfPressed(Orientation orientation, ch.epfl.cs107.play.window.Button b){
+    private void moveIfPressed(Orientation orientation, Button b){
         if(b.isDown()) {
             if (!isDisplacementOccurs()) {
                 orientate(orientation);
@@ -206,7 +262,6 @@ public class RealPlayer extends ICWarsPlayer {
         ((ICWarsInteractionVisitor)v).interactWith(this); }
 
     public void canMove() {
-        
 
         Keyboard keyboard2 = getOwnerArea().getKeyboard();
 
@@ -215,14 +270,30 @@ public class RealPlayer extends ICWarsPlayer {
         moveIfPressed(Orientation.RIGHT, keyboard2.get(Keyboard.RIGHT));
         moveIfPressed(Orientation.DOWN, keyboard2.get(Keyboard.DOWN));
     }
-    //De façon analogue, le dessin des possibilités offertes pour déplacer l’unité sélectionnée
-    // (appel de drawRangeAndPathTo) ne doit se faire que dans l’état MOVE_UNIT.
+
+    public void canMoveOnlyInTheRange() {
+
+        Keyboard keyboard2 = getOwnerArea().getKeyboard();
+
+        if (selectedUnit.getFromX() - getCurrentMainCellCoordinates().x < getSelectedUnit().getRadius())
+        moveIfPressed(Orientation.LEFT, keyboard2.get(Keyboard.LEFT));
+
+        if (getCurrentMainCellCoordinates().y - selectedUnit.getFromY() < getSelectedUnit().getRadius())
+        moveIfPressed(Orientation.UP, keyboard2.get(Keyboard.UP));
+
+        if (getCurrentMainCellCoordinates().x - selectedUnit.getFromX() < getSelectedUnit().getRadius())
+        moveIfPressed(Orientation.RIGHT, keyboard2.get(Keyboard.RIGHT));
+
+        if (selectedUnit.getFromY() - getCurrentMainCellCoordinates().y < getSelectedUnit().getRadius())
+        moveIfPressed(Orientation.DOWN, keyboard2.get(Keyboard.DOWN));
+    }
 
     public faction getCamp() {
         return camp;
     }
 
     private class ICWarsPlayerInteractionHandler implements ICWarsInteractionVisitor {
+
 
         @Override
         public void interactWith(Unit unit) {

@@ -1,46 +1,64 @@
+
 package ch.epfl.cs107.play.game.icwars.actor;
 
 import ch.epfl.cs107.play.game.areagame.Area;
 import ch.epfl.cs107.play.game.areagame.actor.Orientation;
 import ch.epfl.cs107.play.game.areagame.actor.Sprite;
 import ch.epfl.cs107.play.game.areagame.handler.AreaInteractionVisitor;
+import ch.epfl.cs107.play.game.icwars.actor.unit.Action;
+import ch.epfl.cs107.play.game.icwars.actor.unit.Attack;
+import ch.epfl.cs107.play.game.icwars.actor.unit.Wait;
+import ch.epfl.cs107.play.game.icwars.area.ICWarsArea;
 import ch.epfl.cs107.play.game.icwars.handler.ICWarsInteractionVisitor;
 import ch.epfl.cs107.play.math.DiscreteCoordinates;
 import ch.epfl.cs107.play.math.Vector;
 import ch.epfl.cs107.play.window.Canvas;
+
+import java.util.List;
 
 import static ch.epfl.cs107.play.game.icwars.actor.ICWarsActor.faction.ALLIE;
 import static ch.epfl.cs107.play.game.icwars.actor.ICWarsActor.faction.ENNEMIE;
 //import static ch.epfl.cs107.play.game.icwars.actor.ICWarsActor.faction.ENNEMIE2;
 //import static ch.epfl.cs107.play.game.icwars.actor.ICWarsActor.faction.ENNEMIE3;
 
-public class Soldats extends Unit{
+public class Soldats extends Unit {
     private int inflictedDamage = 2;
     private int rayon = 2;
     private int hp;
     private int maxHp = 5;
-    private Sprite soldatAllie = new Sprite("icwars/friendlySoldier", 1.5f, 1.5f,  this, null, new Vector(-0.25f, -0.25f));
+    private Sprite soldatAllie = new Sprite("icwars/friendlySoldier", 1.5f, 1.5f, this, null, new Vector(-0.25f, -0.25f));
     private Sprite soldatEnnemi = new Sprite("icwars/enemySoldier", 1.5f, 1.5f, this, null, new Vector(-0.25f, -0.25f));
+    private ICWarsArea area;
     faction camp;
+    private List<Action> listOfActions;
 
     /**
      * Default MovableAreaEntity constructor
      *
-     * @param area        (Area): Owner area. Not null
-     * @param position    (Coordinate): Initial position of the entity. Not null
+     * @param area     (Area): Owner area. Not null
+     * @param position (Coordinate): Initial position of the entity. Not null
      * @param faction
      */
-    public Soldats(Area area, DiscreteCoordinates position, ICWarsActor.faction faction) {
+
+    public Soldats(ICWarsArea area, DiscreteCoordinates position, ICWarsActor.faction faction) {
         super(area, position, faction, 2);
         int hp = maxHp;
         this.camp = faction;
+        this.area = area;
+        this.listOfActions = List.of(new Attack(this, this.area), new Wait(this, this.area));
     }
 
     @Override
     public void draw(Canvas canvas) {
         if (!theUnitHasBeenUsed()) {
-            if (camp == ALLIE) soldatAllie.draw(canvas);
-            if (camp == ENNEMIE) soldatEnnemi.draw(canvas);
+            if (camp == ALLIE) {
+                soldatAllie.setAlpha(1.0f);
+                soldatAllie.draw(canvas);
+            }
+            if (camp == ENNEMIE) {
+                soldatEnnemi.setAlpha(1.0f);
+                soldatEnnemi.draw(canvas);
+            }
         } else {
             if (camp == ALLIE) soldatAllie.draw(canvas);
             if (camp == ENNEMIE) soldatEnnemi.draw(canvas);
@@ -60,8 +78,8 @@ public class Soldats extends Unit{
     }
 
     @Override
-    public void acceptInteraction(AreaInteractionVisitor v){
-        ((ICWarsInteractionVisitor)v).interactWith(this);
+    public void acceptInteraction(AreaInteractionVisitor v) {
+        ((ICWarsInteractionVisitor) v).interactWith(this);
     }
 
     @Override
@@ -72,6 +90,11 @@ public class Soldats extends Unit{
     @Override
     public int movement() {
         return this.rayon;
+    }
+
+    @Override
+    public List<Action> getPossibleActions() {
+        return listOfActions;
     }
 
     public Sprite getSoldatAllie() {

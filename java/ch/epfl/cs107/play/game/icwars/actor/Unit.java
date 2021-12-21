@@ -1,18 +1,23 @@
 package ch.epfl.cs107.play.game.icwars.actor;
 
 import ch.epfl.cs107.play.game.areagame.Area;
-import ch.epfl.cs107.play.game.areagame.actor.Interactable;
-import ch.epfl.cs107.play.game.areagame.actor.Orientation;
-import ch.epfl.cs107.play.game.areagame.actor.Path;
-import ch.epfl.cs107.play.game.areagame.actor.Sprite;
+import ch.epfl.cs107.play.game.areagame.actor.*;
+import ch.epfl.cs107.play.game.areagame.handler.AreaInteractionVisitor;
+import ch.epfl.cs107.play.game.icwars.actor.players.ICWarsPlayer;
+import ch.epfl.cs107.play.game.icwars.actor.players.RealPlayer;
+import ch.epfl.cs107.play.game.icwars.actor.unit.Action;
+import ch.epfl.cs107.play.game.icwars.area.ICWarsBehavior;
 import ch.epfl.cs107.play.game.icwars.area.ICWarsRange;
+import ch.epfl.cs107.play.game.icwars.handler.ICWarsInteractionVisitor;
 import ch.epfl.cs107.play.math.DiscreteCoordinates;
 import ch.epfl.cs107.play.window.Canvas;
 
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Queue;
 
-public abstract class Unit extends ICWarsActor implements Interactable {
+public abstract class Unit extends ICWarsActor implements Interactable, Interactor {
     private String name;
     private int hp;         //hp cannot be <0 or unit isDead()
     private int maxHp;
@@ -22,6 +27,7 @@ public abstract class Unit extends ICWarsActor implements Interactable {
     private int fromY;
     private int radius;
     private boolean unitIsUsed;
+    public ICWarsBehavior.ICWarsCellType cellType = null;
 
     /**
      * Default MovableAreaEntity constructor
@@ -39,8 +45,8 @@ public abstract class Unit extends ICWarsActor implements Interactable {
         this.radius = radius;
         this.range = new ICWarsRange();
 
-        for (int x = Math.max(0, fromX - radius); x <= Math.min(getOwnerArea().getWidth(), fromX + radius); ++x) {
-            for (int y = Math.max(0, fromY - radius); y <= Math.min(getOwnerArea().getHeight(), fromY + radius); ++y) {
+        for (int x = Math.max(0, fromX - radius); x <= Math.min(getOwnerArea().getWidth() - 1, fromX + radius); ++x) {
+            for (int y = Math.max(0, fromY - radius); y <= Math.min(getOwnerArea().getHeight() - 1, fromY + radius); ++y) {
                 DiscreteCoordinates coordinates = new DiscreteCoordinates(x, y);
 
                 boolean hasLeftEdge = false;
@@ -51,10 +57,10 @@ public abstract class Unit extends ICWarsActor implements Interactable {
                 if (x > fromX - radius && x > 0) {
                     hasLeftEdge = true;
                 }
-                if (y < fromY + radius && y < getOwnerArea().getHeight()) {
+                if (y  < fromY + radius && y < getOwnerArea().getHeight()) {
                     hasUpEdge = true;
                 }
-                if (x < fromX + radius && x < getOwnerArea().getWidth()) {
+                if (x < fromX + radius && x < getOwnerArea().getWidth()){
                     hasRightEdge = true;
                 }
                 if (y > fromY - radius && y > 0) {
@@ -68,7 +74,13 @@ public abstract class Unit extends ICWarsActor implements Interactable {
 
     public String getName(){return name;}
 
-    public int getHp(Unit unit){
+    public void setHp(Unit unit, int hp){
+        if(hp > maxHp) hp = unit.maxHp;
+        if(hp < 0) hp = 0;
+        unit.hp = hp;
+    }
+
+    public int getHp(){
         int hpCopie;
         if (hp > maxHp) hp = maxHp;
         if(hp < 0) hp = 0;
@@ -76,7 +88,7 @@ public abstract class Unit extends ICWarsActor implements Interactable {
         return hpCopie;
     }
 
-    public boolean isDead(Unit unit){return getHp(unit) < 0;}
+    public boolean isDead(Unit unit){return this.getHp() < 0;}
 
     public int receiveDamage(int hp, int damage){return hp - damage;}
 
@@ -189,13 +201,85 @@ public abstract class Unit extends ICWarsActor implements Interactable {
         this.unitIsUsed = value;
     }
 
-    //À vérifier (méthodes rajoutées)
-    public abstract List getPossibleActions();
+    public int getRadius() {
+        return radius;
+    }
+
+    public int getFromX() {
+        return fromX;
+    }
+
+    public int getFromY() {
+        return fromY;
+    }
+
+    public abstract List<Action> getPossibleActions();
 
     //trying to get current cell stars
 
     public void centerCamera(){
         getOwnerArea().setViewCandidate(this);
     }
+
+    public ICWarsBehavior.ICWarsCellType getCellType() {
+        return cellType;
+    }
+
+    private class ICWarsPlayerInteractionHandler2 implements ICWarsInteractionVisitor {
+
+        @Override
+        public void interactWith(ICWarsBehavior.ICWarsCellType typeOfCell) {
+            cellType = typeOfCell.getType();
+            System.out.println("INTERAGIT");
+            System.out.println(cellType.typeToString());
+        }
+
+    }
+    @Override
+    public List<DiscreteCoordinates> getCurrentCells() {
+        return Collections.singletonList(getCurrentMainCellCoordinates());
+    }
+
+    /**
+     * Get this Interactor's current field of view cells coordinates
+     *
+     * @return (List of DiscreteCoordinates). May be empty but not null
+     */
+    @Override
+    public List<DiscreteCoordinates> getFieldOfViewCells() {
+        return null;
+    }
+
+    /**
+     * @return (boolean): true if this require cell interaction
+     */
+    @Override
+    public boolean wantsCellInteraction() {
+        return true;
+    }
+
+    /**
+     * @return (boolean): true if this require view interaction
+     */
+    @Override
+    public boolean wantsViewInteraction() {
+        return false;
+    }
+
+
+    @Override
+    public void interactWith(Interactable other) {
+        Unit.ICWarsPlayerInteractionHandler2 handler = new Unit.ICWarsPlayerInteractionHandler2();
+        other.acceptInteraction(handler);
+        System.out.println(1);
+    }
+
+    @Override
+    public void acceptInteraction(AreaInteractionVisitor v) {
+        ((ICWarsInteractionVisitor)v).interactWith(this);
+        System.out.println(3);
+    }
+
+
 }
 

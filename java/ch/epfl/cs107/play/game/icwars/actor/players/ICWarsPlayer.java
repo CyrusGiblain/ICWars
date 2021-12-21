@@ -5,10 +5,13 @@ import ch.epfl.cs107.play.game.areagame.actor.Interactable;
 import ch.epfl.cs107.play.game.areagame.actor.Interactor;
 import ch.epfl.cs107.play.game.areagame.actor.Sprite;
 import ch.epfl.cs107.play.game.areagame.handler.AreaInteractionVisitor;
+import ch.epfl.cs107.play.game.icwars.ICWars;
 import ch.epfl.cs107.play.game.icwars.actor.ICWarsActor;
 import ch.epfl.cs107.play.game.icwars.actor.Unit;
+import ch.epfl.cs107.play.game.icwars.area.ICWarsArea;
 import ch.epfl.cs107.play.game.icwars.handler.ICWarsInteractionVisitor;
 import ch.epfl.cs107.play.math.DiscreteCoordinates;
+import ch.epfl.cs107.play.math.Vector;
 import ch.epfl.cs107.play.window.Canvas;
 
 import java.util.ArrayList;
@@ -21,16 +24,26 @@ public class ICWarsPlayer extends ICWarsActor implements Interactor {
     protected Sprite sprite;
     public Unit selectedUnit;
     protected ICWarsPlayer.ICWarsPlayerCurrentState currentState;
+    private DiscreteCoordinates coords;
+    private Unit unitOnWhichHeIsLocated;
+
 
     public ICWarsPlayer(Area area, DiscreteCoordinates position, faction camp, Unit... units) {
         super(area, position, camp);
         this.units.addAll(Arrays.asList(units));
         registerUnits();
         this.currentState = ICWarsPlayerCurrentState.IDLE;
+        this.coords = position;
     }
 
     public void update(float deltaTime) {
         super.update(deltaTime);
+        for (Unit unit : this.getUnits()) {
+            if ((this.getCurrentMainCellCoordinates().x) == (unit.getFromX()) &&
+                    (this.getCurrentMainCellCoordinates().y) == (unit.getFromY())) {
+                unitOnWhichHeIsLocated = unit;
+            }
+        }
         for (int i = 0; i < units.size(); ++i) {
             if (units.get(i).isDead(units.get(i))) {
                 getOwnerArea().unregisterActor(units.get(i));
@@ -79,7 +92,6 @@ public class ICWarsPlayer extends ICWarsActor implements Interactor {
      */
     @Override
     public void interactWith(Interactable other) {
-
     }
 
     public enum ICWarsPlayerCurrentState {
@@ -92,6 +104,9 @@ public class ICWarsPlayer extends ICWarsActor implements Interactor {
     }
 
     public void startTurn() {
+        for (Unit unit : this.getUnits()) {
+            unit.setIsUsed(false);
+        }
         currentState = ICWarsPlayerCurrentState.NORMAL;
     }
 
@@ -171,7 +186,18 @@ public class ICWarsPlayer extends ICWarsActor implements Interactor {
         return currentState;
     }
 
+    public void setCurrentPosition(DiscreteCoordinates coords) {
+        this.coords = coords;
+    }
+
     public List<Unit> getUnits() {
         return units;
     }
+
+    public Unit getUnitOnWhichHeIsLocated() {
+        return unitOnWhichHeIsLocated;
+    }
+
+
+
 }

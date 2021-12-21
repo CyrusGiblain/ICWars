@@ -21,7 +21,7 @@ import java.util.*;
 import static ch.epfl.cs107.play.game.icwars.actor.ICWarsActor.faction.*;
 
 public class ICWars extends AreaGame {
-    ICWarsArea area;
+    public ICWarsArea area;
     //private RealPlayer player;
     private List<ICWarsPlayer> listOfPlayers = new ArrayList<>();
     private RealPlayer firstPlayerOfTheList;
@@ -48,17 +48,18 @@ public class ICWars extends AreaGame {
         Button tab = keyboard.get(Keyboard.TAB);
         Button G = keyboard.get(Keyboard.G);
 
-        if (areaIndex == 0) {
-
+            //if (areaIndex == 0) {
             //if (keyN.isReleased()) {
             //     switchArea();
             //}
 
             if (keyR.isReleased()) {
-                begin(getWindow(), getFileSystem());
+                listOfPlayers.clear();
+                initArea(areas[0]);
+                listOfPlayersWaitingForTheCurrentRound.clear();
+                listOfPlayersWaitingForNextTurn.clear();
+                icWarsCurrentState = ICWarsCurrentState.INIT;
             }
-        }
-
 
 
         switch (icWarsCurrentState) {
@@ -160,9 +161,6 @@ public class ICWars extends AreaGame {
 
     private void initArea(String areaKey) {
 
-        listOfPlayers.clear();
-        listOfPlayersWaitingForNextTurn.clear();
-
         ICWarsArea area = (ICWarsArea) setCurrentArea(areaKey, true);
 
         DiscreteCoordinates coordsALLY = area.getPlayerSpawnPosition();
@@ -189,12 +187,22 @@ public class ICWars extends AreaGame {
 
         //DiscreteCoordinates coordsOfTheTankOfTheFourthRealPlayer = new DiscreteCoordinates(6, 1);
         //DiscreteCoordinates coordsOfTheSoldatOfTheFourthRealPlayer = new DiscreteCoordinates(7, 1);
+        Unit tankFirstPlayer = new Tanks(area, coordsOfTheTankOfTheFirstRealPlayer, ALLIE);
+        Unit soldatFirstPlayer = new Soldats(area, coordsOfTheSoldatOfTheFirstRealPlayer, ALLIE);
+        firstPlayerOfTheList = new RealPlayer(area, coordsALLY, ALLIE, tankFirstPlayer,
+                soldatFirstPlayer);
 
-        firstPlayerOfTheList = new RealPlayer(area, coordsALLY, ALLIE, new Tanks(area, coordsOfTheTankOfTheFirstRealPlayer, ALLIE),
-                new Soldats(area, coordsOfTheSoldatOfTheFirstRealPlayer, ALLIE));
 
-        secondPlayerOfTheList = new RealPlayer(area, coordsEnnemy1, ENNEMIE, new Tanks(area, coordsOfTheTankOfTheSecondRealPlayer, ENNEMIE),
-                new Soldats(area, coordsOfTheSoldatOfTheSecondRealPlayer, ENNEMIE));
+        Unit tankSecondPlayer = new Tanks(area, coordsOfTheTankOfTheSecondRealPlayer, ENNEMIE);
+        Unit soldatSecondPlayer = new Soldats(area, coordsOfTheSoldatOfTheSecondRealPlayer, ENNEMIE);
+        secondPlayerOfTheList = new RealPlayer(area, coordsEnnemy1, ENNEMIE, tankSecondPlayer,
+                soldatSecondPlayer);
+        units.add(tankSecondPlayer);
+        units.add(soldatSecondPlayer);
+        area.units.add(tankFirstPlayer);
+        area.units.add(soldatFirstPlayer);
+        area.units.add(soldatSecondPlayer);
+        area.units.add(soldatSecondPlayer);
 
         //thirdPlayerOfTheList = new RealPlayer(area, coordsEnnemy2, ENNEMIE2, new Tanks(area, coordsOfTheTankOfTheThirdRealPlayer, ENNEMIE2),
                 //new Soldats(area, coordsOfTheSoldatOfTheThirdRealPlayer, ENNEMIE2));
@@ -247,4 +255,6 @@ public class ICWars extends AreaGame {
         END_TURN,
         END;
     }
+
+
 }
