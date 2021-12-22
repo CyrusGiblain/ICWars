@@ -5,7 +5,7 @@ import ch.epfl.cs107.play.game.actor.ImageGraphics;
 import ch.epfl.cs107.play.game.actor.ShapeGraphics;
 import ch.epfl.cs107.play.game.actor.TextGraphics;
 import ch.epfl.cs107.play.game.areagame.io.ResourcePath;
-import ch.epfl.cs107.play.game.icwars.actor.Unit;
+import ch.epfl.cs107.play.game.icwars.actor.players.unit.Unit;
 import ch.epfl.cs107.play.game.icwars.area.ICWarsBehavior;
 import ch.epfl.cs107.play.math.*;
 import ch.epfl.cs107.play.math.Polygon;
@@ -20,7 +20,6 @@ public class ICWarsInfoPanel implements Graphics {
     private final float fontSize;
 
     private ICWarsBehavior.ICWarsCellType cellType;
-    private Unit unit;
 
     /// Sprite and text graphics line
     private final ShapeGraphics cellDetailsBackground, unitDetailsBackground;
@@ -77,9 +76,6 @@ public class ICWarsInfoPanel implements Graphics {
         this.cellType = cellType;
     }
 
-    public void setUnit(Unit unit) {
-        this.unit = unit;
-    }
 
     @Override
     public void draw(Canvas canvas) {
@@ -89,8 +85,6 @@ public class ICWarsInfoPanel implements Graphics {
 
 		if (cellType != null)
 		    drawCellDetails(canvas, height, width);
-		if (unit != null)
-		    drawUnitDetails(canvas, height, width);
     }
 
     private void drawCellDetails(Canvas canvas, float height, float width) {
@@ -139,7 +133,7 @@ public class ICWarsInfoPanel implements Graphics {
         }
     }
 
-    private void drawUnitDetails(Canvas canvas, float height, float width) {
+    /*private void drawUnitDetails(Canvas canvas, float height, float width) {
         final Transform transform = Transform.I.translated(canvas.getPosition().add(width/4, -height/2));
        unitDetailsBackground.setRelativeTransform(transform);
         unitDetailsBackground.draw(canvas);
@@ -160,5 +154,5 @@ public class ICWarsInfoPanel implements Graphics {
         unitDamageText.setText("DMG: " + unit.getDamage());
        unitDamageText.draw(canvas);
     }
-
+*/
 }

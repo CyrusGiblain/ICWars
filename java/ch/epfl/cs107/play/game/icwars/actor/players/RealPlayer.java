@@ -5,12 +5,12 @@ import ch.epfl.cs107.play.game.areagame.actor.Interactable;
 import ch.epfl.cs107.play.game.areagame.actor.Orientation;
 import ch.epfl.cs107.play.game.areagame.actor.Sprite;
 import ch.epfl.cs107.play.game.areagame.handler.AreaInteractionVisitor;
-import ch.epfl.cs107.play.game.icwars.actor.Soldats;
-import ch.epfl.cs107.play.game.icwars.actor.Tanks;
-import ch.epfl.cs107.play.game.icwars.actor.Unit;
-import ch.epfl.cs107.play.game.icwars.actor.unit.Action;
-import ch.epfl.cs107.play.game.icwars.actor.unit.Attack;
-import ch.epfl.cs107.play.game.icwars.actor.unit.Wait;
+import ch.epfl.cs107.play.game.icwars.actor.players.unit.Soldats;
+import ch.epfl.cs107.play.game.icwars.actor.players.unit.Tanks;
+import ch.epfl.cs107.play.game.icwars.actor.players.unit.Unit;
+import ch.epfl.cs107.play.game.icwars.actor.players.action.Action;
+import ch.epfl.cs107.play.game.icwars.actor.players.action.Attack;
+import ch.epfl.cs107.play.game.icwars.actor.players.action.Wait;
 import ch.epfl.cs107.play.game.icwars.area.ICWarsArea;
 import ch.epfl.cs107.play.game.icwars.area.ICWarsBehavior;
 import ch.epfl.cs107.play.game.icwars.gui.ICWarsActionsPanel;
@@ -35,10 +35,8 @@ public class RealPlayer extends ICWarsPlayer {
     /// Animation duration in frame number
     private final static int MOVE_DURATION = 8;
     private ICWarsArea area;
-    private Action actToExecute;
-    ICWarsInfoPanel ICWarsInfoPanel;
-    ICWarsActionsPanel panel;
-    ICWarsBehavior.ICWarsCellType cellType ;
+    private Action action;
+
     /**
      * Demo actor
      *
@@ -96,9 +94,9 @@ public class RealPlayer extends ICWarsPlayer {
 
                    }
                 }
-                if (tab.isReleased()) {
-                    currentState = ICWarsPlayerCurrentState.IDLE;
-                }
+                // if(tab.isReleased()) {
+                  //  currentState = ICWarsPlayerCurrentState.IDLE;
+                //}
                 break;
 
             case SELECT_CELL:
@@ -133,38 +131,23 @@ public class RealPlayer extends ICWarsPlayer {
                 break;
 
             case ACTION_SELECTION:
-                if (selectedUnit instanceof Tanks) {
-                    for (int i = 0; i < selectedUnit.getPossibleActions().size(); ++i) {
-                        Action action = selectedUnit.getPossibleActions().get(i);
-                        if (A.isReleased()) {
-                            System.out.println(" A SELECTIONNEE");
-                            actToExecute = new Attack(this.getSelectedUnit(), this.area);
-                            currentState = ICWarsPlayerCurrentState.ACTION;
-                        } else if (W.isReleased()) {
-                            System.out.println(("W SELECTIONNEE"));
-                            actToExecute = new Wait(this.getSelectedUnit(), this.area);
-                            currentState = ICWarsPlayerCurrentState.NORMAL;
-                        }
-
-
+                for (int i = 0; i < selectedUnit.getPossibleActions().size(); ++i) {
+                    action= selectedUnit.getPossibleActions().get(i);
+                    if (A.isReleased()) {
+                        System.out.println(" A SELECTIONNEE");
+                        action = new Attack(this.getSelectedUnit(), this.area);
+                        currentState = ICWarsPlayerCurrentState.ACTION;
+                    } else if (W.isReleased()) {
+                        System.out.println(("W SELECTIONNEE"));
+                        action = new Wait(this.getSelectedUnit(), this.area);
+                        currentState = ICWarsPlayerCurrentState.NORMAL;
                     }
-                } else if (selectedUnit instanceof Soldats) {
-                    for (Action act : ((Soldats) selectedUnit).getPossibleActions()) {
-                        if (W.isReleased()) {
-                            currentState = ICWarsPlayerCurrentState.ACTION;
-                            if (act instanceof Attack) {
-                                actToExecute = new Attack(this.getSelectedUnit(), this.area);
-                            } else {
-                                actToExecute = new Wait(this.getSelectedUnit(), this.area);
-                            }
-                        }
-                    }
-            }
+                }
                 break;
 
             case ACTION:
                 float dt = 0;
-               actToExecute.doAction(dt, this, keyboard1);
+               action.doAction(dt, this, keyboard1);
                 break;
 
         }
@@ -307,6 +290,11 @@ public class RealPlayer extends ICWarsPlayer {
         if (index < units.size()) {
             this.selectedUnit = units.get(index);
         }
+    }
+
+    @Override
+    public ICWarsPlayerCurrentState getCurrentState(){
+        return currentState;
     }
 }
 

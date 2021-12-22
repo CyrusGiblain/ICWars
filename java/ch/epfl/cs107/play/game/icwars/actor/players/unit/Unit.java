@@ -1,18 +1,16 @@
-package ch.epfl.cs107.play.game.icwars.actor;
+package ch.epfl.cs107.play.game.icwars.actor.players.unit;
 
 import ch.epfl.cs107.play.game.areagame.Area;
 import ch.epfl.cs107.play.game.areagame.actor.*;
 import ch.epfl.cs107.play.game.areagame.handler.AreaInteractionVisitor;
-import ch.epfl.cs107.play.game.icwars.actor.players.ICWarsPlayer;
-import ch.epfl.cs107.play.game.icwars.actor.players.RealPlayer;
-import ch.epfl.cs107.play.game.icwars.actor.unit.Action;
+import ch.epfl.cs107.play.game.icwars.actor.ICWarsActor;
+import ch.epfl.cs107.play.game.icwars.actor.players.action.Action;
 import ch.epfl.cs107.play.game.icwars.area.ICWarsBehavior;
 import ch.epfl.cs107.play.game.icwars.area.ICWarsRange;
 import ch.epfl.cs107.play.game.icwars.handler.ICWarsInteractionVisitor;
 import ch.epfl.cs107.play.math.DiscreteCoordinates;
 import ch.epfl.cs107.play.window.Canvas;
 
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Queue;
@@ -147,7 +145,7 @@ public abstract class Unit extends ICWarsActor implements Interactable, Interact
         return changePosition;
     }
 
-    public faction getCamp() {
+    public ICWarsActor.faction getCamp() {
         return camp;
     }
 
@@ -230,10 +228,7 @@ public abstract class Unit extends ICWarsActor implements Interactable, Interact
         @Override
         public void interactWith(ICWarsBehavior.ICWarsCellType typeOfCell) {
             cellType = typeOfCell.getType();
-            System.out.println("INTERAGIT");
-            System.out.println(cellType.typeToString());
         }
-
     }
     @Override
     public List<DiscreteCoordinates> getCurrentCells() {

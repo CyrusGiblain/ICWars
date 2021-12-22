@@ -1,13 +1,14 @@
 
-package ch.epfl.cs107.play.game.icwars.actor;
+package ch.epfl.cs107.play.game.icwars.actor.players.unit;
 
 import ch.epfl.cs107.play.game.areagame.Area;
 import ch.epfl.cs107.play.game.areagame.actor.Orientation;
 import ch.epfl.cs107.play.game.areagame.actor.Sprite;
 import ch.epfl.cs107.play.game.areagame.handler.AreaInteractionVisitor;
-import ch.epfl.cs107.play.game.icwars.actor.unit.Action;
-import ch.epfl.cs107.play.game.icwars.actor.unit.Attack;
-import ch.epfl.cs107.play.game.icwars.actor.unit.Wait;
+import ch.epfl.cs107.play.game.icwars.actor.ICWarsActor;
+import ch.epfl.cs107.play.game.icwars.actor.players.action.Action;
+import ch.epfl.cs107.play.game.icwars.actor.players.action.Attack;
+import ch.epfl.cs107.play.game.icwars.actor.players.action.Wait;
 import ch.epfl.cs107.play.game.icwars.area.ICWarsArea;
 import ch.epfl.cs107.play.game.icwars.handler.ICWarsInteractionVisitor;
 import ch.epfl.cs107.play.math.DiscreteCoordinates;

@@ -1,15 +1,12 @@
 
-package ch.epfl.cs107.play.game.icwars.actor.unit;
+package ch.epfl.cs107.play.game.icwars.actor.players.action;
 
 
 import ch.epfl.cs107.play.game.actor.ImageGraphics;
-import ch.epfl.cs107.play.game.areagame.Area;
 import ch.epfl.cs107.play.game.areagame.io.ResourcePath;
-import ch.epfl.cs107.play.game.icwars.ICWars;
-import ch.epfl.cs107.play.game.icwars.actor.Unit;
 import ch.epfl.cs107.play.game.icwars.actor.players.ICWarsPlayer;
+import ch.epfl.cs107.play.game.icwars.actor.players.unit.Unit;
 import ch.epfl.cs107.play.game.icwars.area.ICWarsArea;
-import ch.epfl.cs107.play.game.icwars.area.ICWarsBehavior;
 import ch.epfl.cs107.play.math.DiscreteCoordinates;
 import ch.epfl.cs107.play.math.RegionOfInterest;
 import ch.epfl.cs107.play.math.Vector;
@@ -26,13 +23,12 @@ import static ch.epfl.cs107.play.window.Keyboard.*;
 public class Attack extends Action{
 
     private String name = "(A)ttack";
-    int actionKey = 65;
+    Button actionKey = area.getKeyboard().get(A);
     Keyboard keyboard = area.getKeyboard();
     Button enter = keyboard.get(ENTER);
     Button left = keyboard.get(LEFT);
     Button right = keyboard.get(RIGHT);
     Button tab = keyboard.get(TAB);
-    List<Unit> enemyUnitsInRange = new ArrayList<>();
     Unit attackedUnit;
 
     public Attack(Unit unit, ICWarsArea area){
@@ -51,35 +47,39 @@ public class Attack extends Action{
     //then create a list of all those ones
     @Override
     public void doAction(float dt, ICWarsPlayer player, Keyboard keyboard) {
-        enemyUnitsInRange = getUnitsinRange(player, player.getSelectedUnit());
-        int attackedUnitIndex = 0;
+        List<Unit> UnitsInRange = getUnitsinRange(player);
+        List<Unit> enemyUnitsInRange = new ArrayList<>();
+        for(Unit unit : UnitsInRange){
+            if(unit.getCamp() != player.selectedUnit.getCamp()) enemyUnitsInRange.add(unit);
+        }
         Unit currentUnit = player.getSelectedUnit();
         if(enemyUnitsInRange != null) {
-            DiscreteCoordinates coords = new DiscreteCoordinates((int) enemyUnitsInRange.get(attackedUnitIndex).getPosition().x,
-                    (int) enemyUnitsInRange.get(attackedUnitIndex).getPosition().y);
+            int attackedUnitIndex = 0;
+            // Flèche droite ou flèche gauche pressée
             if (right.isReleased()) {
                 ++attackedUnitIndex;
                 if (attackedUnitIndex >= enemyUnitsInRange.size()) attackedUnitIndex = 0;
                 enemyUnitsInRange.get(attackedUnitIndex).centerCamera();
-                player.setCurrentPosition(coords);
+                player.setCurrentPosition(new DiscreteCoordinates((int) enemyUnitsInRange.get(attackedUnitIndex).getPosition().x,
+                        (int) enemyUnitsInRange.get(attackedUnitIndex).getPosition().y));
             }
             if (left.isReleased()) {
                 --attackedUnitIndex;
                 if (attackedUnitIndex < 0) attackedUnitIndex = enemyUnitsInRange.size() - 1;
                 enemyUnitsInRange.get(attackedUnitIndex).centerCamera();
-                player.setCurrentPosition(coords);
+                player.setCurrentPosition(new DiscreteCoordinates((int) enemyUnitsInRange.get(attackedUnitIndex).getPosition().x,
+                        (int) enemyUnitsInRange.get(attackedUnitIndex).getPosition().y));
             }
             if (enter.isReleased()) {
-                //normal that attackedUnit isn't initialzied, need to get it from the ArrayList
+                //attack
                 attackedUnit = enemyUnitsInRange.get(attackedUnitIndex);
                 impactOnHP(currentUnit, attackedUnit);
                 if (attackedUnit.isDead(attackedUnit)) {
-                    currentUnit.changePosition(coords);
+                    currentUnit.changePosition(new DiscreteCoordinates((int) attackedUnit.getPosition().x,
+                            (int) attackedUnit.getPosition().y));
                 }
-                attackedUnit.theUnitHasBeenUsed();
-                ICWarsPlayer.ICWarsPlayerCurrentState currentState;
-                currentState = ICWarsPlayer.ICWarsPlayerCurrentState.NORMAL;
-                attackedUnit.centerCamera();
+                player.selectedUnit.setIsUsed(true);
+                player.setCurrentState(ICWarsPlayer.ICWarsPlayerCurrentState.NORMAL);
             }
             //Dans la 4.3 on nous demande de modifier cette méthode, ainsi :
             if (enemyUnitsInRange.isEmpty() || tab.isReleased()) {
@@ -117,9 +117,9 @@ public class Attack extends Action{
         return this.name;
     }
 
-    public List<Unit> getUnitsinRange(ICWarsPlayer player, Unit selectedUnit){
+    public List<Unit> getUnitsinRange(ICWarsPlayer player){
         List<Unit> listOfUnitsInRange = new ArrayList<>();
-
+        Unit selectedUnit = player.selectedUnit;
         for(int i = selectedUnit.getFromX() - player.getSelectedUnit().getRadius();
             i  < selectedUnit.getFromX() + selectedUnit.getRadius() ; ++i) {
             for (int j = selectedUnit.getFromY() - player.getSelectedUnit().getRadius();

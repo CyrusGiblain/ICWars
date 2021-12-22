@@ -2,9 +2,9 @@ package ch.epfl.cs107.play.game.icwars;
 
 import ch.epfl.cs107.play.game.areagame.AreaGame;
 import ch.epfl.cs107.play.game.icwars.actor.ICWarsActor;
-import ch.epfl.cs107.play.game.icwars.actor.Soldats;
-import ch.epfl.cs107.play.game.icwars.actor.Tanks;
-import ch.epfl.cs107.play.game.icwars.actor.Unit;
+import ch.epfl.cs107.play.game.icwars.actor.players.unit.Soldats;
+import ch.epfl.cs107.play.game.icwars.actor.players.unit.Tanks;
+import ch.epfl.cs107.play.game.icwars.actor.players.unit.Unit;
 import ch.epfl.cs107.play.game.icwars.actor.players.ICWarsPlayer;
 import ch.epfl.cs107.play.game.icwars.actor.players.RealPlayer;
 import ch.epfl.cs107.play.game.icwars.area.ICWarsArea;
@@ -182,15 +182,9 @@ public class ICWars extends AreaGame {
         DiscreteCoordinates coordsOfTheTankOfTheSecondRealPlayer = new DiscreteCoordinates(8, 5);
         DiscreteCoordinates coordsOfTheSoldatOfTheSecondRealPlayer = new DiscreteCoordinates(9, 5);
 
-        //DiscreteCoordinates coordsOfTheTankOfTheThirdRealPlayer = new DiscreteCoordinates(4, 1);
-        //DiscreteCoordinates coordsOfTheSoldatOfTheThirdRealPlayer = new DiscreteCoordinates(5, 1);
-
-        //DiscreteCoordinates coordsOfTheTankOfTheFourthRealPlayer = new DiscreteCoordinates(6, 1);
-        //DiscreteCoordinates coordsOfTheSoldatOfTheFourthRealPlayer = new DiscreteCoordinates(7, 1);
         Unit tankFirstPlayer = new Tanks(area, coordsOfTheTankOfTheFirstRealPlayer, ALLIE);
         Unit soldatFirstPlayer = new Soldats(area, coordsOfTheSoldatOfTheFirstRealPlayer, ALLIE);
-        firstPlayerOfTheList = new RealPlayer(area, coordsALLY, ALLIE, tankFirstPlayer,
-                soldatFirstPlayer);
+        firstPlayerOfTheList = new RealPlayer(area, coordsALLY, ALLIE, tankFirstPlayer, soldatFirstPlayer);
 
 
         Unit tankSecondPlayer = new Tanks(area, coordsOfTheTankOfTheSecondRealPlayer, ENNEMIE);

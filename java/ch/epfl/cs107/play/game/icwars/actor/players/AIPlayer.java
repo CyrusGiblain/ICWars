@@ -2,17 +2,14 @@ package ch.epfl.cs107.play.game.icwars.actor.players;
 
 
 import ch.epfl.cs107.play.game.areagame.Area;
-import ch.epfl.cs107.play.game.icwars.actor.Unit;
-import ch.epfl.cs107.play.game.icwars.actor.unit.Action;
-import ch.epfl.cs107.play.game.icwars.actor.unit.Attack;
+import ch.epfl.cs107.play.game.icwars.actor.players.unit.Unit;
+import ch.epfl.cs107.play.game.icwars.actor.players.action.Action;
 import ch.epfl.cs107.play.math.DiscreteCoordinates;
-import ch.epfl.cs107.play.window.Button;
 import ch.epfl.cs107.play.window.Keyboard;
 
 import java.util.ArrayList;
 
 import static ch.epfl.cs107.play.game.icwars.actor.players.ICWarsPlayer.ICWarsPlayerCurrentState.*;
-import static javax.swing.UIManager.get;
 
 public class AIPlayer extends ICWarsPlayer {
     private ArrayList<Unit> Enemyunits;
@@ -154,4 +151,6 @@ public class AIPlayer extends ICWarsPlayer {
         }
         return false;
     }
+
+
 }
