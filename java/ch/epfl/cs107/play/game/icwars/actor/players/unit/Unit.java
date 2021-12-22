@@ -26,6 +26,7 @@ public abstract class Unit extends ICWarsActor implements Interactable, Interact
     private int radius;
     private boolean unitIsUsed;
     public ICWarsBehavior.ICWarsCellType cellType = null;
+    private ICWarsRange updatedRange = new ICWarsRange();
 
     /**
      * Default MovableAreaEntity constructor
@@ -161,7 +162,6 @@ public abstract class Unit extends ICWarsActor implements Interactable, Interact
 
     public void updateRange(int radius, DiscreteCoordinates newPosition) {
 
-        ICWarsRange updatedRange = new ICWarsRange();
 
         this.fromX = newPosition.x;
         this.fromY = newPosition.y;
@@ -273,7 +273,7 @@ public abstract class Unit extends ICWarsActor implements Interactable, Interact
         System.out.println(3);
     }
     public ICWarsRange getRange(){
-        return range;
+        return updatedRange;
     }
 
 }

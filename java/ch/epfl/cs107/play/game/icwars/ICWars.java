@@ -182,20 +182,17 @@ public class ICWars extends AreaGame {
         DiscreteCoordinates coordsOfTheTankOfTheSecondRealPlayer = new DiscreteCoordinates(8, 5);
         DiscreteCoordinates coordsOfTheSoldatOfTheSecondRealPlayer = new DiscreteCoordinates(9, 5);
 
-        Unit tankFirstPlayer = new Tanks(area, coordsOfTheTankOfTheFirstRealPlayer, ALLIE);
-        Unit soldatFirstPlayer = new Soldats(area, coordsOfTheSoldatOfTheFirstRealPlayer, ALLIE);
+        Tanks tankFirstPlayer = new Tanks(area, coordsOfTheTankOfTheFirstRealPlayer, ALLIE);
+        Soldats soldatFirstPlayer = new Soldats(area, coordsOfTheSoldatOfTheFirstRealPlayer, ALLIE);
         firstPlayerOfTheList = new RealPlayer(area, coordsALLY, ALLIE, tankFirstPlayer, soldatFirstPlayer);
 
 
-        Unit tankSecondPlayer = new Tanks(area, coordsOfTheTankOfTheSecondRealPlayer, ENNEMIE);
-        Unit soldatSecondPlayer = new Soldats(area, coordsOfTheSoldatOfTheSecondRealPlayer, ENNEMIE);
-        secondPlayerOfTheList = new RealPlayer(area, coordsEnnemy1, ENNEMIE, tankSecondPlayer,
-                soldatSecondPlayer);
-        units.add(tankSecondPlayer);
-        units.add(soldatSecondPlayer);
+        Tanks tankSecondPlayer = new Tanks(area, coordsOfTheTankOfTheSecondRealPlayer, ENNEMIE);
+        Soldats soldatSecondPlayer = new Soldats(area, coordsOfTheSoldatOfTheSecondRealPlayer, ENNEMIE);
+        secondPlayerOfTheList = new RealPlayer(area, coordsEnnemy1, ENNEMIE, tankSecondPlayer, soldatSecondPlayer);
         area.units.add(tankFirstPlayer);
         area.units.add(soldatFirstPlayer);
-        area.units.add(soldatSecondPlayer);
+        area.units.add(tankSecondPlayer);
         area.units.add(soldatSecondPlayer);
 
         //thirdPlayerOfTheList = new RealPlayer(area, coordsEnnemy2, ENNEMIE2, new Tanks(area, coordsOfTheTankOfTheThirdRealPlayer, ENNEMIE2),

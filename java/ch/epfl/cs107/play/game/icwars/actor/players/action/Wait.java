@@ -17,9 +17,7 @@ public class Wait extends Action {
     }
 
     @Override
-    public void draw(Canvas canvas) {
-
-    }
+    public void draw(Canvas canvas) {}
 
     @Override
     public void doAction(float dt, ICWarsPlayer player, Keyboard keyboard) {

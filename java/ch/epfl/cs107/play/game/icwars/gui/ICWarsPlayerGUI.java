@@ -37,11 +37,7 @@ public class ICWarsPlayerGUI implements Graphics {
         Unit selectedUnit = player.getSelectedUnit();
 
             selectedUnit.drawRangeAndPathTo(destination, canvas);
-            if(player.getCurrentState() == ICWarsPlayer.ICWarsPlayerCurrentState.ACTION_SELECTION) {
-                out.println("azertyujhgfghjijhgfdfghjhgfv");
-                actionsPanel.setActions(selectedUnit.getPossibleActions());
-                actionsPanel.draw(canvas);
-            }
+
             if (player.getCurrentState() == ICWarsPlayer.ICWarsPlayerCurrentState.NORMAL ||
             player.getCurrentState() == ICWarsPlayer.ICWarsPlayerCurrentState.SELECT_CELL) {
                 infoPanel.setCurrentCell(cellType);
