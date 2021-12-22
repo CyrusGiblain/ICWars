@@ -32,8 +32,9 @@ public class RealPlayer extends ICWarsPlayer {
     protected List<Unit> memory;
     private ICWarsPlayerGUI icWarsPlayerGUI;
     private boolean theSelectedUnitHasBeenUsed = false;
-    /// Animation duration in frame number
-    private final static int MOVE_DURATION = 8;
+    // Animation duration in frame number
+    //to Change before rendu
+    private final static int MOVE_DURATION = 3;
     private ICWarsArea area;
     private Action action;
 
@@ -79,7 +80,6 @@ public class RealPlayer extends ICWarsPlayer {
                 break;
 
             case NORMAL:
-
                 canMove();
 
                 centerCamera();
@@ -122,9 +122,8 @@ public class RealPlayer extends ICWarsPlayer {
                         currentState = ICWarsPlayerCurrentState.ACTION_SELECTION;
                     }
                 }
-
                 if (tab.isReleased()) {
-                    currentState = ICWarsPlayerCurrentState.NORMAL;
+                    currentState = ICWarsPlayerCurrentState.IDLE;
                 }
                 break;
 
@@ -189,6 +188,9 @@ public class RealPlayer extends ICWarsPlayer {
         sprite.draw(canvas);
         if (currentState == ICWarsPlayerCurrentState.MOVE_UNIT) {
             icWarsPlayerGUI.draw(canvas);
+        }
+        if(currentState == ICWarsPlayerCurrentState.ACTION && action != null){
+            action.draw(canvas);
         }
     }
 

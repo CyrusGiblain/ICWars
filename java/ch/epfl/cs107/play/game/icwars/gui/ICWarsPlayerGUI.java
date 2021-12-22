@@ -15,7 +15,7 @@ public class ICWarsPlayerGUI implements Graphics {
     private ICWarsPlayer player;
     private ICWarsActionsPanel actionsPanel;
     private ICWarsInfoPanel infoPanel;
-    protected static final int FONT_SIZE = 20;
+    protected static final float FONT_SIZE = 20.f;
 
     public ICWarsPlayerGUI(float cameraScaleFactor, ICWarsPlayer player) {
         this.player = player;

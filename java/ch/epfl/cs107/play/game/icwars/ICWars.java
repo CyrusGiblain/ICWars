@@ -78,7 +78,6 @@ public class ICWars extends AreaGame {
                     icWarsCurrentState = ICWarsCurrentState.END_TURN;
 
                 } else {
-
                     currentPlayer = listOfPlayersWaitingForTheCurrentRound.get(0);
                     listOfPlayersWaitingForTheCurrentRound.remove(0);
                     icWarsCurrentState = ICWarsCurrentState.START_PLAYER_TURN;
@@ -102,7 +101,7 @@ public class ICWars extends AreaGame {
             case END_PLAYER_TURN:
                 if (currentPlayer.isDefeated()) {
                     area.unregisterActor(currentPlayer);
-                } else {
+                            } else if(tab.isReleased()){
                     listOfPlayersWaitingForNextTurn.add(currentPlayer);
                     for (int i = 0; i < currentPlayer.getUnits().size(); ++i) {
                         currentPlayer.getUnits().get(i).setIsUsed(false);

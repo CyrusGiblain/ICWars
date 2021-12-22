@@ -24,22 +24,23 @@ import java.util.List;
 import static ch.epfl.cs107.play.window.Keyboard.*;
 
 //may be an interface
-public class Attack extends Action implements Graphics {
+public class Attack extends Action{
 
     private String name = "(A)ttack";
     private Unit attackedUnit;
     private List<Unit> enemyUnitsInRange = new ArrayList<>();
     private int attackedUnitIndex = 0;
+    ImageGraphics cursor;
 
     public Attack(Unit unit, ICWarsArea area){
         super(unit, area);
+        cursor = new ImageGraphics(ResourcePath.getSprite("icwars/UIpackSheet"), 1f, 1f, new RegionOfInterest(4*18, 26*18,16,16));
     }
 
     @Override
     public void draw(Canvas canvas) {
         System.out.println(1);
-        ImageGraphics cursor = new ImageGraphics(ResourcePath.getSprite("icwars/UIpackSheet"), 1f, 1f, new RegionOfInterest(4*18, 26*18,16,16));
-        if(enemyUnitsInRange != null) {
+        if(!enemyUnitsInRange.isEmpty()) {
             System.out.println("Drawing");
             cursor.setAnchor(canvas.getPosition().add(1, 0));
             cursor.draw(canvas);
@@ -57,32 +58,36 @@ public class Attack extends Action implements Graphics {
 
         Unit currentUnit = player.getSelectedUnit();
         enemyUnitsInRange = getEnemyUnitsInRange(player);
-        // Flèche droite ou flèche gauche pressée
-        if (right.isReleased() && attackedUnitIndex < enemyUnitsInRange.size()-1) {
-            //System.out.println("Right");
-            ++attackedUnitIndex;
+
+        if (tab.isReleased()) {
+            goBack(player);
         }
-        if (left.isReleased() && attackedUnitIndex > 0) {
-            //System.out.println("Left");
-            --attackedUnitIndex;
-        }
-        enemyUnitsInRange.get(attackedUnitIndex).centerCamera();
-        //System.out.println(enemyUnitsInRange.get(attackedUnitIndex));
-        if (enter.isReleased()) {
-            //attack
-            attackedUnit = enemyUnitsInRange.get(attackedUnitIndex);
-            impactOnHP(currentUnit, attackedUnit);
-            if (attackedUnit.isDead(attackedUnit)) {
-                currentUnit.changePosition(new DiscreteCoordinates((int)player.getPosition().x, (int)player.getPosition().y));
-            }
-            player.selectedUnit.setIsUsed(true);
-            player.setCurrentState(ICWarsPlayer.ICWarsPlayerCurrentState.NORMAL);
-        }
-        if (enemyUnitsInRange.isEmpty()){
+        if(enemyUnitsInRange.size() == 0) {
             goBack(player);
             System.out.println("Nothing is in the Range!");
         }
-        if(tab.isReleased()){goBack(player);}
+        else{
+            if (right.isReleased() && attackedUnitIndex < enemyUnitsInRange.size() - 1) {
+                //System.out.println("Right");
+                ++attackedUnitIndex;
+            }
+            if (left.isReleased() && attackedUnitIndex > 0) {
+                //System.out.println("Left");
+                --attackedUnitIndex;
+            }
+            enemyUnitsInRange.get(attackedUnitIndex).centerCamera();
+            //System.out.println(enemyUnitsInRange.get(attackedUnitIndex));
+            if (enter.isReleased()) {
+                //attack
+                attackedUnit = enemyUnitsInRange.get(attackedUnitIndex);
+                impactOnHP(currentUnit, attackedUnit);
+                if (attackedUnit.isDead(attackedUnit)) {
+                    currentUnit.changePosition(new DiscreteCoordinates((int) player.getPosition().x, (int) player.getPosition().y));
+                }
+                player.selectedUnit.setIsUsed(true);
+                player.setCurrentState(ICWarsPlayer.ICWarsPlayerCurrentState.NORMAL);
+            }
+        }
     }
 
     @Override
@@ -113,7 +118,7 @@ public class Attack extends Action implements Graphics {
 
     public List<Unit> getEnemyUnitsInRange(ICWarsPlayer player){
         List<Unit> listOfEnemyUnitsInRange = new ArrayList<>();
-        Unit selectedUnit = player.selectedUnit;
+        Unit selectedUnit = player.getSelectedUnit();
          for(int i = 0; i < area.units.size(); ++i) {
              Unit unit = area.units.get(i);
              DiscreteCoordinates coords = new DiscreteCoordinates((int)unit.getPosition().x, (int)unit.getPosition().y);
