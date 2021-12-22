@@ -66,8 +66,6 @@ public class RealPlayer extends ICWarsPlayer {
 
         super.update(deltaTime);
 
-        System.out.println(currentState);
-
         Keyboard keyboard1= getOwnerArea().getKeyboard();
 
         Button enter = keyboard1.get(Keyboard.ENTER);

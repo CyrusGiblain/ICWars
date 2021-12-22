@@ -8,6 +8,8 @@ import ch.epfl.cs107.play.game.icwars.area.ICWarsBehavior;
 import ch.epfl.cs107.play.math.DiscreteCoordinates;
 import ch.epfl.cs107.play.window.Canvas;
 
+import static java.lang.System.out;
+
 public class ICWarsPlayerGUI implements Graphics {
 
     private ICWarsPlayer player;
@@ -35,9 +37,8 @@ public class ICWarsPlayerGUI implements Graphics {
         Unit selectedUnit = player.getSelectedUnit();
 
             selectedUnit.drawRangeAndPathTo(destination, canvas);
-
             if(player.getCurrentState() == ICWarsPlayer.ICWarsPlayerCurrentState.ACTION_SELECTION) {
-                System.out.println("azertyujhgfghjijhgfdfghjhgfv");
+                out.println("azertyujhgfghjijhgfdfghjhgfv");
                 actionsPanel.setActions(selectedUnit.getPossibleActions());
                 actionsPanel.draw(canvas);
             }

@@ -141,7 +141,6 @@ public abstract class Unit extends ICWarsActor implements Interactable, Interact
                 }
             }
         }
-
         return changePosition;
     }
 
@@ -266,7 +265,6 @@ public abstract class Unit extends ICWarsActor implements Interactable, Interact
     public void interactWith(Interactable other) {
         Unit.ICWarsPlayerInteractionHandler2 handler = new Unit.ICWarsPlayerInteractionHandler2();
         other.acceptInteraction(handler);
-        System.out.println(1);
     }
 
     @Override
@@ -274,7 +272,9 @@ public abstract class Unit extends ICWarsActor implements Interactable, Interact
         ((ICWarsInteractionVisitor)v).interactWith(this);
         System.out.println(3);
     }
-
+    public ICWarsRange getRange(){
+        return range;
+    }
 
 }
 

@@ -161,7 +161,7 @@ public class ICWars extends AreaGame {
 
     private void initArea(String areaKey) {
 
-        ICWarsArea area = (ICWarsArea) setCurrentArea(areaKey, true);
+        area = (ICWarsArea) setCurrentArea(areaKey, true);
 
         DiscreteCoordinates coordsALLY = area.getPlayerSpawnPosition();
         DiscreteCoordinates coordsEnnemy1 = area.getEnemySpawnPosition();
