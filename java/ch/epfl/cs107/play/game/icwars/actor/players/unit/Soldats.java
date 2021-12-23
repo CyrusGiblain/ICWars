@@ -99,7 +99,6 @@ public class Soldats extends Unit {
         return inflictedDamage;
     }
 
-
     @Override
     public List<Action> getPossibleActions() {
         return listOfActions;

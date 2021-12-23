@@ -39,7 +39,6 @@ public class Attack extends Action{
 
     @Override
     public void draw(Canvas canvas) {
-        System.out.println(1);
         if(!enemyUnitsInRange.isEmpty()) {
             System.out.println("Drawing");
             cursor.setAnchor(canvas.getPosition().add(1, 0));
