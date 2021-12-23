@@ -31,7 +31,6 @@ public class RealPlayer extends ICWarsPlayer {
     private Sprite sprite;
     private String spriteName;
     private ICWarsPlayerGUI icWarsPlayerGUI;
-    private boolean theSelectedUnitHasBeenUsed = false;
     // Animation duration in frame number
     //to Change before rendu
     private final static int MOVE_DURATION = 3;
@@ -285,7 +284,6 @@ public class RealPlayer extends ICWarsPlayer {
                 icWarsPlayerGUI.setUnit(unit);
                 currentState = ICWarsPlayerCurrentState.MOVE_UNIT;
             }
-            //icWarsPlayerGUI.setCellUnit(getSelectedUnit());
         }
 
         @Override

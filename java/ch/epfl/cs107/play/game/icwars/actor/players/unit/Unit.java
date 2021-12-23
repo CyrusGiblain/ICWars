@@ -79,14 +79,20 @@ public abstract class Unit extends ICWarsActor implements Interactable, Interact
 
     public void setHp(Unit unit, int hp){
         if(hp > maxHp) hp = unit.maxHp;
-        if(hp < 0) hp = 0;
+        if(hp < 0) {
+            hp = 0;
+            this.isDead(this);
+        }
         unit.hp = hp;
     }
 
     public int getHp(){
         int hpCopie;
         if (hp > maxHp) hp = maxHp;
-        if(hp < 0) hp = 0;
+        if(hp < 0){
+            hp = 0;
+            this.isDead(this);
+        }
         hpCopie = hp;
         return hpCopie;
     }
@@ -106,12 +112,11 @@ public abstract class Unit extends ICWarsActor implements Interactable, Interact
         ICWarsUnitInteractionHandler handler = new ICWarsUnitInteractionHandler();
         return hp - other.getDamage() + cellStars;
     }
-
+    public int getCellStars(){return cellStars;}
     public void setCellStars(int cellStars) {
         this.cellStars = cellStars;
     }
 
-    public abstract int movement();
 
     public boolean takeCellSpace(){return true;}
 
@@ -262,6 +267,7 @@ public abstract class Unit extends ICWarsActor implements Interactable, Interact
         return updatedRange;
     }
 
+
     @Override
     public void interactWith(Interactable other){
         other.acceptInteraction(handler);
@@ -274,8 +280,8 @@ public abstract class Unit extends ICWarsActor implements Interactable, Interact
     private class ICWarsUnitInteractionHandler implements ICWarsInteractionVisitor {
 
         @Override
-        public void interactWith(ICWarsBehavior.ICWarsCellType cell) {
-            setCellStars(cell.getDefenseStar());
+        public void interactWith(ICWarsBehavior.ICWarsCellType cellType){
+            setCellStars(cellType.getDefenseStar());
         }
     }
 }

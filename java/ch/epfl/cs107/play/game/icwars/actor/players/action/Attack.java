@@ -110,7 +110,7 @@ public class Attack extends Action{
     public void impactOnHP(Unit attackingUnit, Unit attackedUnit){
         // have to work on the interactor
         //int defense_stars = attackedUnit.getCurrentCellTypeStars(attackedUnit);
-        int damage = attackedUnit.getHp() - attackingUnit.getDamage();
+        int damage = attackedUnit.getHp() - attackingUnit.getDamage() + attackingUnit.getCellStars();
         attackedUnit.setHp(attackedUnit, damage);
     }
 

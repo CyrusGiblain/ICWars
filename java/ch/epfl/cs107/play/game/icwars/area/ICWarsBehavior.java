@@ -11,7 +11,7 @@ import ch.epfl.cs107.play.window.Window;
 
 import java.util.List;
 
-public class ICWarsBehavior extends AreaBehavior {
+public class ICWarsBehavior extends AreaBehavior{
     public enum ICWarsCellType {
         NONE(0, 0),          // Should never be used except
         ROAD(-16777216, 0), // the second value is the number of defense stars
@@ -190,10 +190,13 @@ public class ICWarsBehavior extends AreaBehavior {
             public void acceptInteraction (AreaInteractionVisitor v){
                 ((ICWarsInteractionVisitor) v).interactWith(this);
             }
+            public class ICWarsCellInteractionHandler implements ICWarsInteractionVisitor{
+            @Override
+                public void interactWith(ICWarsCellType cellType){
 
-            public ICWarsCellType getType(){
-                return type;
+                }
             }
+            public ICWarsCellType getType(){return type;}
         }
 
     }

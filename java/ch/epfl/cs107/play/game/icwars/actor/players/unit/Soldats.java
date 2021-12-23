@@ -26,7 +26,7 @@ import static ch.epfl.cs107.play.game.icwars.actor.ICWarsActor.faction.ENNEMIE;
 public class Soldats extends Unit {
     private int inflictedDamage = 2;
     private int rayon = 2;
-    private int hp;
+    private int hp = getHp();
     private int maxHp = 5;
     private Sprite soldatAllie = new Sprite("icwars/friendlySoldier", 1.5f, 1.5f, this, null, new Vector(-0.25f, -0.25f));
     private Sprite soldatEnnemi = new Sprite("icwars/enemySoldier", 1.5f, 1.5f, this, null, new Vector(-0.25f, -0.25f));
@@ -44,7 +44,7 @@ public class Soldats extends Unit {
 
     public Soldats(ICWarsArea area, DiscreteCoordinates position, ICWarsActor.faction faction) {
         super(area, position, faction, 2);
-        setHp(this, maxHp);
+        this.setHp(this, maxHp);
         this.camp = faction;
         this.area = area;
         this.listOfActions = List.of(new Attack(this, this.area), new Wait(this, this.area));
@@ -93,20 +93,12 @@ public class Soldats extends Unit {
         return false;
     }
 
-    @Override
-    public void acceptInteraction(AreaInteractionVisitor v) {
-        ((ICWarsInteractionVisitor) v).interactWith(this);
-    }
 
     @Override
     public int getDamage() {
         return inflictedDamage;
     }
 
-    @Override
-    public int movement() {
-        return this.rayon;
-    }
 
     @Override
     public List<Action> getPossibleActions() {
@@ -121,6 +113,4 @@ public class Soldats extends Unit {
         return soldatEnnemi;
     }
 
-    @Override
-    public void interactWith(Interactable other) {}
 }
