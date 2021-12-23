@@ -13,6 +13,7 @@ import ch.epfl.cs107.play.game.icwars.actor.players.action.Attack;
 import ch.epfl.cs107.play.game.icwars.actor.players.action.Wait;
 import ch.epfl.cs107.play.game.icwars.area.ICWarsArea;
 import ch.epfl.cs107.play.game.icwars.area.ICWarsBehavior;
+import ch.epfl.cs107.play.game.icwars.area.ICWarsBehavior.ICWarsCellType;
 import ch.epfl.cs107.play.game.icwars.gui.ICWarsActionsPanel;
 import ch.epfl.cs107.play.game.icwars.gui.ICWarsInfoPanel;
 import ch.epfl.cs107.play.game.icwars.gui.ICWarsPlayerGUI;
@@ -29,7 +30,6 @@ public class RealPlayer extends ICWarsPlayer {
     private float hp;
     private Sprite sprite;
     private String spriteName;
-    protected List<Unit> memory;
     private ICWarsPlayerGUI icWarsPlayerGUI;
     private boolean theSelectedUnitHasBeenUsed = false;
     // Animation duration in frame number
@@ -37,6 +37,9 @@ public class RealPlayer extends ICWarsPlayer {
     private final static int MOVE_DURATION = 3;
     private ICWarsArea area;
     private Action action;
+    private ICWarsCellType cellType;
+
+
 
     /**
      * Demo actor
@@ -186,9 +189,8 @@ public class RealPlayer extends ICWarsPlayer {
     @Override
     public void draw(Canvas canvas) {
         sprite.draw(canvas);
-        if (currentState == ICWarsPlayerCurrentState.MOVE_UNIT) {
             icWarsPlayerGUI.draw(canvas);
-        }
+
         if(currentState == ICWarsPlayerCurrentState.ACTION && action != null){
             action.draw(canvas);
         }
@@ -233,7 +235,6 @@ public class RealPlayer extends ICWarsPlayer {
         return false;
     }
 
-
     @Override
     public void interactWith(Interactable other) {
         ICWarsPlayerInteractionHandler handler = new ICWarsPlayerInteractionHandler();
@@ -275,6 +276,7 @@ public class RealPlayer extends ICWarsPlayer {
         return camp;
     }
 
+
     private class ICWarsPlayerInteractionHandler implements ICWarsInteractionVisitor {
 
 
@@ -282,8 +284,17 @@ public class RealPlayer extends ICWarsPlayer {
         public void interactWith(Unit unit) {
             if (getCamp().equals(unit.getCamp()) && currentState == ICWarsPlayerCurrentState.SELECT_CELL) {
                 selectedUnit = unit;
+                icWarsPlayerGUI.setUnit(unit);
+                currentState = ICWarsPlayerCurrentState.MOVE_UNIT;
             }
+            icWarsPlayerGUI.setCellUnit(selectedUnit);
         }
+
+        @Override
+        public void interactWith(ICWarsBehavior.ICWarsCell cell){
+            cellType = cell.getType();
+        }
+
     }
 
     public void selectUnit(int index) {
@@ -296,5 +307,10 @@ public class RealPlayer extends ICWarsPlayer {
     public ICWarsPlayerCurrentState getCurrentState(){
         return currentState;
     }
+
+    public ICWarsCellType getCellType(){
+        return cellType;
+    }
+
 }
 

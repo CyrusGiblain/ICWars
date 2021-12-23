@@ -1,6 +1,7 @@
 package ch.epfl.cs107.play.game.icwars.actor.players.unit;
 
 import ch.epfl.cs107.play.game.areagame.Area;
+import ch.epfl.cs107.play.game.areagame.actor.Interactable;
 import ch.epfl.cs107.play.game.areagame.actor.Orientation;
 import ch.epfl.cs107.play.game.areagame.actor.Sprite;
 import ch.epfl.cs107.play.game.areagame.handler.AreaInteractionVisitor;
@@ -120,4 +121,7 @@ public class Tanks extends Unit{
     public List<Action> getListOfActions() {
         return listOfActions;
     }
+
+    @Override
+    public void interactWith(Interactable other) {    }
 }

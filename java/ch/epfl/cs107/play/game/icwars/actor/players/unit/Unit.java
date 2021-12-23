@@ -4,6 +4,7 @@ import ch.epfl.cs107.play.game.areagame.Area;
 import ch.epfl.cs107.play.game.areagame.actor.*;
 import ch.epfl.cs107.play.game.areagame.handler.AreaInteractionVisitor;
 import ch.epfl.cs107.play.game.icwars.actor.ICWarsActor;
+import ch.epfl.cs107.play.game.icwars.actor.players.RealPlayer;
 import ch.epfl.cs107.play.game.icwars.actor.players.action.Action;
 import ch.epfl.cs107.play.game.icwars.area.ICWarsBehavior;
 import ch.epfl.cs107.play.game.icwars.area.ICWarsRange;
@@ -25,8 +26,10 @@ public abstract class Unit extends ICWarsActor implements Interactable, Interact
     private int fromY;
     private int radius;
     private boolean unitIsUsed;
-    public ICWarsBehavior.ICWarsCellType cellType = null;
+    private ICWarsBehavior.ICWarsCellType cellType = null;
     private ICWarsRange updatedRange = new ICWarsRange();
+    private int cellStars;
+    private ICWarsUnitInteractionHandler handler;
 
     /**
      * Default MovableAreaEntity constructor
@@ -36,13 +39,14 @@ public abstract class Unit extends ICWarsActor implements Interactable, Interact
      * @param faction
      */
     public Unit( Area area, DiscreteCoordinates position, ICWarsActor.faction faction, int radius) {
-
         super(area, position, faction);
 
         this.fromX = position.x;
         this.fromY = position.y;
         this.radius = radius;
         this.range = new ICWarsRange();
+
+        handler = new ICWarsUnitInteractionHandler();
 
         for (int x = Math.max(0, fromX - radius); x <= Math.min(getOwnerArea().getWidth() - 1, fromX + radius); ++x) {
             for (int y = Math.max(0, fromY - radius); y <= Math.min(getOwnerArea().getHeight() - 1, fromY + radius); ++y) {
@@ -98,8 +102,13 @@ public abstract class Unit extends ICWarsActor implements Interactable, Interact
 
     public abstract int getDamage();
 
-    public int inflictDamage(int damage){
-        return hp-getDamage();
+    public int damageTaken(Unit other) {
+        ICWarsUnitInteractionHandler handler = new ICWarsUnitInteractionHandler();
+        return hp - other.getDamage() + cellStars;
+    }
+
+    public void setCellStars(int cellStars) {
+        this.cellStars = cellStars;
     }
 
     public abstract int movement();
@@ -218,17 +227,6 @@ public abstract class Unit extends ICWarsActor implements Interactable, Interact
         getOwnerArea().setViewCandidate(this);
     }
 
-    public ICWarsBehavior.ICWarsCellType getCellType() {
-        return cellType;
-    }
-
-    private class ICWarsPlayerInteractionHandler2 implements ICWarsInteractionVisitor {
-
-        @Override
-        public void interactWith(ICWarsBehavior.ICWarsCellType typeOfCell) {
-            cellType = typeOfCell.getType();
-        }
-    }
     @Override
     public List<DiscreteCoordinates> getCurrentCells() {
         return Collections.singletonList(getCurrentMainCellCoordinates());
@@ -260,21 +258,21 @@ public abstract class Unit extends ICWarsActor implements Interactable, Interact
         return false;
     }
 
-
-    @Override
-    public void interactWith(Interactable other) {
-        Unit.ICWarsPlayerInteractionHandler2 handler = new Unit.ICWarsPlayerInteractionHandler2();
-        other.acceptInteraction(handler);
-    }
-
-    @Override
-    public void acceptInteraction(AreaInteractionVisitor v) {
-        ((ICWarsInteractionVisitor)v).interactWith(this);
-        System.out.println(3);
-    }
     public ICWarsRange getRange(){
         return updatedRange;
     }
 
+    @Override
+    public void interactWith(Interactable other){
+        other.acceptInteraction(handler);
+    }
+
+    private class ICWarsUnitInteractionHandler implements ICWarsInteractionVisitor {
+
+        @Override
+        public void interactWith(ICWarsBehavior.ICWarsCellType cell) {
+            setCellStars(cell.getDefenseStar());
+        }
+    }
 }
 

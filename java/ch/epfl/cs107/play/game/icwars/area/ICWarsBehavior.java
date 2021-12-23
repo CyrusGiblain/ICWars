@@ -140,7 +140,6 @@ public class ICWarsBehavior extends AreaBehavior {
 
     public class ICWarsCell extends Cell implements Interactable {
         private final ICWarsBehavior.ICWarsCellType type;
-
         /**
          * Default Cell constructor
          *
@@ -188,8 +187,12 @@ public class ICWarsBehavior extends AreaBehavior {
 
             @Override
             public void acceptInteraction (AreaInteractionVisitor v){
-                ((ICWarsInteractionVisitor) v).interactWith(type.getType());
+                ((ICWarsInteractionVisitor) v).interactWith(this);
+            }
 
+            public ICWarsCellType getType(){
+                return type;
             }
         }
+
     }

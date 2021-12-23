@@ -191,9 +191,6 @@ public class ICWarsPlayer extends ICWarsActor implements Interactor {
         return units;
     }
 
-    public Unit getUnitOnWhichHeIsLocated() {
-        return unitOnWhichHeIsLocated;
-    }
 
     public void setCurrentState(ICWarsPlayerCurrentState currentState){
         this.currentState = currentState;

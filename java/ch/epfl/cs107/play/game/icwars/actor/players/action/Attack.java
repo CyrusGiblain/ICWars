@@ -68,12 +68,14 @@ public class Attack extends Action{
         }
         else{
             if (right.isReleased() && attackedUnitIndex < enemyUnitsInRange.size() - 1) {
-                //System.out.println("Right");
                 ++attackedUnitIndex;
+            } else if(right.isReleased() && attackedUnitIndex == enemyUnitsInRange.size()-1) {
+                attackedUnitIndex = 0;
             }
             if (left.isReleased() && attackedUnitIndex > 0) {
-                //System.out.println("Left");
                 --attackedUnitIndex;
+            } else if(left.isReleased() && attackedUnitIndex == 0){
+                attackedUnitIndex = enemyUnitsInRange.size()-1;
             }
             enemyUnitsInRange.get(attackedUnitIndex).centerCamera();
             //System.out.println(enemyUnitsInRange.get(attackedUnitIndex));

@@ -16,7 +16,7 @@ import java.awt.*;
 
 
 public class ICWarsInfoPanel implements Graphics {
-
+    private Unit unit;
     private final float fontSize;
 
     private ICWarsBehavior.ICWarsCellType cellType;
@@ -70,12 +70,13 @@ public class ICWarsInfoPanel implements Graphics {
                TextAlign.Horizontal.LEFT, TextAlign.Vertical.MIDDLE, 1.0f, 3001f);
     }
 
-
+    public void setUnit(Unit unit){
+        this.unit = unit;
+    }
 
     public void setCurrentCell(ICWarsBehavior.ICWarsCellType cellType) {
         this.cellType = cellType;
     }
-
 
     @Override
     public void draw(Canvas canvas) {
@@ -83,8 +84,9 @@ public class ICWarsInfoPanel implements Graphics {
 		float width = canvas.getXScale();
 		float height = canvas.getYScale();
 
-		if (cellType != null)
-		    drawCellDetails(canvas, height, width);
+
+
+		if (cellType != null) drawCellDetails(canvas, height, width);
     }
 
     private void drawCellDetails(Canvas canvas, float height, float width) {
@@ -133,7 +135,9 @@ public class ICWarsInfoPanel implements Graphics {
         }
     }
 
-    /*private void drawUnitDetails(Canvas canvas, float height, float width) {
+
+
+    private void drawUnitDetails(Canvas canvas, float height, float width) {
         final Transform transform = Transform.I.translated(canvas.getPosition().add(width/4, -height/2));
        unitDetailsBackground.setRelativeTransform(transform);
         unitDetailsBackground.draw(canvas);
@@ -154,5 +158,5 @@ public class ICWarsInfoPanel implements Graphics {
         unitDamageText.setText("DMG: " + unit.getDamage());
        unitDamageText.draw(canvas);
     }
-*/
+
 }
