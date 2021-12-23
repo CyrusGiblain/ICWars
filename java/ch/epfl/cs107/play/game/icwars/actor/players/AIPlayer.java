@@ -4,6 +4,7 @@ package ch.epfl.cs107.play.game.icwars.actor.players;
 import ch.epfl.cs107.play.game.areagame.Area;
 import ch.epfl.cs107.play.game.icwars.actor.players.unit.Unit;
 import ch.epfl.cs107.play.game.icwars.actor.players.action.Action;
+import ch.epfl.cs107.play.game.icwars.area.ICWarsArea;
 import ch.epfl.cs107.play.math.DiscreteCoordinates;
 import ch.epfl.cs107.play.window.Keyboard;
 
@@ -12,12 +13,18 @@ import java.util.ArrayList;
 import static ch.epfl.cs107.play.game.icwars.actor.players.ICWarsPlayer.ICWarsPlayerCurrentState.*;
 
 public class AIPlayer extends ICWarsPlayer {
-    private ArrayList<Unit> Enemyunits;
-    private ArrayList<Unit> AIControlledunits;
+    private ArrayList<Unit> Enemyunits = new ArrayList<>();
+    private ArrayList<Unit> AIControlledunits = new ArrayList<>();
     Keyboard keyboard = getOwnerArea().getKeyboard();
+    private faction camp;
 
-    public AIPlayer(Area area, DiscreteCoordinates position, faction camp, Unit... units) {
+    public AIPlayer(ICWarsArea area, DiscreteCoordinates position, faction camp, Unit... units) {
         super(area, position, camp, units);
+        this.camp = camp;
+        for(int i = 0; i < area.units.size(); ++i){
+            if(area.units.get(i).getCamp() == camp) AIControlledunits.add(area.units.get(i));
+            else {Enemyunits.add(area.units.get(i));}
+        }
     }
 
     @Override

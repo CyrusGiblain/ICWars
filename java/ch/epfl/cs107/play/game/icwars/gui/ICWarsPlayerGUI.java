@@ -42,7 +42,6 @@ public class ICWarsPlayerGUI implements Graphics {
         if (player.getCurrentState() == ICWarsPlayer.ICWarsPlayerCurrentState.NORMAL ||
             player.getCurrentState() == ICWarsPlayer.ICWarsPlayerCurrentState.SELECT_CELL||
             player.getCurrentState() == ICWarsPlayer.ICWarsPlayerCurrentState.MOVE_UNIT) {
-            infoPanel.setUnit(cellUnit);
             infoPanel.setCurrentCell(((RealPlayer)player).getCellType());
             infoPanel.draw(canvas);
         }
@@ -52,7 +51,8 @@ public class ICWarsPlayerGUI implements Graphics {
             actionsPanel.draw(canvas);
         }
     }
-    public void setCellUnit(Unit cellUnit){infoPanel.setUnit(cellUnit);}
+    public void setCellUnit(Unit cellUnit){infoPanel.setUnit(cellUnit);
+        this.cellUnit = cellUnit;}
     public void setUnit(Unit unit){this.unit = unit;}
 }
 //Le RealPlayer devra communiquer, quand il y a intéraction, les infos sur la cellule sur laquelle il se trouve.

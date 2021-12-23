@@ -266,6 +266,10 @@ public abstract class Unit extends ICWarsActor implements Interactable, Interact
     public void interactWith(Interactable other){
         other.acceptInteraction(handler);
     }
+    @Override
+    public void acceptInteraction(AreaInteractionVisitor v) {
+        ((ICWarsInteractionVisitor)v).interactWith(this);
+    }
 
     private class ICWarsUnitInteractionHandler implements ICWarsInteractionVisitor {
 

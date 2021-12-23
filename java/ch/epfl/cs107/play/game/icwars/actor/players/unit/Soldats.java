@@ -44,10 +44,24 @@ public class Soldats extends Unit {
 
     public Soldats(ICWarsArea area, DiscreteCoordinates position, ICWarsActor.faction faction) {
         super(area, position, faction, 2);
-        int hp = maxHp;
+        setHp(this, maxHp);
         this.camp = faction;
         this.area = area;
         this.listOfActions = List.of(new Attack(this, this.area), new Wait(this, this.area));
+    }
+
+    @Override
+    public int getHp(){
+        return hp;
+    }
+
+    @Override
+    public String getName() {
+        if (camp.equals(ALLIE)) {
+            return "icwars/friendlySoldier";
+        } else {
+            return "icwars/enemySoldier";
+        }
     }
 
     @Override

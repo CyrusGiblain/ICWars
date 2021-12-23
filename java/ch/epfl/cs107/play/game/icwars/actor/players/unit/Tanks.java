@@ -25,7 +25,7 @@ public class Tanks extends Unit{
     private int inflictedDamage = 7;
     private int rayon = 4;
     private int hp;
-    private int maxHp = 10;
+    private final int maxHp = 10;
     private Sprite tankAllie = new Sprite("icwars/friendlyTank", 1.5f, 1.5f,  this, null, new Vector(-0.25f, -0.25f));
     private Sprite tankEnnemi = new Sprite("icwars/enemyTank", 1.5f, 1.5f, this, null, new Vector(-0.25f, -0.25f));
     private ICWarsArea area;
@@ -42,11 +42,19 @@ public class Tanks extends Unit{
      */
     public Tanks(ICWarsArea area,  DiscreteCoordinates position, ICWarsActor.faction faction) {
         super(area, position, faction, 4);
-
-        int hp = maxHp;
+        setHp(this, maxHp);
         this.camp = faction;
         this.area = area;
         this.listOfActions = List.of(new Attack(this, this.area), new Wait(this, this.area));
+    }
+
+    @Override
+    public String getName() {
+        if (camp.equals(ALLIE)) {
+            return "icwars/friendlyTank";
+        } else {
+            return "icwars/enemyTank";
+        }
     }
 
 
@@ -67,6 +75,9 @@ public class Tanks extends Unit{
             unit.setAlpha(0.5f);
 
         }
+    }
+    public int getHp(){
+        return hp;
     }
 
     @Override

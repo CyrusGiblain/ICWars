@@ -240,7 +240,6 @@ public class RealPlayer extends ICWarsPlayer {
         ICWarsPlayerInteractionHandler handler = new ICWarsPlayerInteractionHandler();
         other.acceptInteraction(handler);
     }
-
     @Override
     public void acceptInteraction(AreaInteractionVisitor v) {
         ((ICWarsInteractionVisitor)v).interactWith(this); }
@@ -278,16 +277,15 @@ public class RealPlayer extends ICWarsPlayer {
 
 
     private class ICWarsPlayerInteractionHandler implements ICWarsInteractionVisitor {
-
-
         @Override
         public void interactWith(Unit unit) {
+            icWarsPlayerGUI.setCellUnit(unit);
             if (getCamp().equals(unit.getCamp()) && currentState == ICWarsPlayerCurrentState.SELECT_CELL) {
                 selectedUnit = unit;
                 icWarsPlayerGUI.setUnit(unit);
                 currentState = ICWarsPlayerCurrentState.MOVE_UNIT;
             }
-            icWarsPlayerGUI.setCellUnit(unit);
+            //icWarsPlayerGUI.setCellUnit(getSelectedUnit());
         }
 
         @Override

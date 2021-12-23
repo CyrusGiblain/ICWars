@@ -23,6 +23,7 @@ public class ICWarsPlayer extends ICWarsActor implements Interactor {
     protected ICWarsPlayer.ICWarsPlayerCurrentState currentState;
     private DiscreteCoordinates coords;
     private Unit unitOnWhichHeIsLocated;
+    private String spriteName;
 
 
     public ICWarsPlayer(Area area, DiscreteCoordinates position, faction camp, Unit... units) {
@@ -31,6 +32,12 @@ public class ICWarsPlayer extends ICWarsActor implements Interactor {
         registerUnits();
         this.currentState = ICWarsPlayerCurrentState.IDLE;
         this.coords = position;
+        if (camp == faction.ALLIE) {
+            spriteName = "icwars/allyCursor";
+        } else {
+            spriteName = "icwars/enemyCursor";
+        }
+        sprite = new Sprite(spriteName, 1.f, 1.f,this);
     }
 
     public void update(float deltaTime) {
@@ -148,7 +155,7 @@ public class ICWarsPlayer extends ICWarsActor implements Interactor {
      */
     @Override
     public boolean isCellInteractable() {
-        return false;
+        return true;
     }
 
     /**
