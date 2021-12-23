@@ -2,6 +2,7 @@ package ch.epfl.cs107.play.game.icwars.area;
 
 import ch.epfl.cs107.play.game.areagame.AreaBehavior;
 import ch.epfl.cs107.play.game.areagame.actor.Interactable;
+import ch.epfl.cs107.play.game.areagame.actor.Interactor;
 import ch.epfl.cs107.play.game.areagame.handler.AreaInteractionVisitor;
 import ch.epfl.cs107.play.game.icwars.actor.players.ICWarsPlayer;
 import ch.epfl.cs107.play.game.icwars.handler.ICWarsInteractionVisitor;
@@ -10,7 +11,7 @@ import ch.epfl.cs107.play.window.Window;
 
 import java.util.List;
 
-public class ICWarsBehavior extends AreaBehavior {
+public class ICWarsBehavior extends AreaBehavior{
     public enum ICWarsCellType {
         NONE(0, 0),          // Should never be used except
         ROAD(-16777216, 0), // the second value is the number of defense stars
@@ -140,7 +141,6 @@ public class ICWarsBehavior extends AreaBehavior {
 
     public class ICWarsCell extends Cell implements Interactable {
         private final ICWarsBehavior.ICWarsCellType type;
-
         /**
          * Default Cell constructor
          *
@@ -188,8 +188,15 @@ public class ICWarsBehavior extends AreaBehavior {
 
             @Override
             public void acceptInteraction (AreaInteractionVisitor v){
-                ((ICWarsInteractionVisitor) v).interactWith(type.getType());
-
+                ((ICWarsInteractionVisitor) v).interactWith(this);
             }
+            public class ICWarsCellInteractionHandler implements ICWarsInteractionVisitor{
+            @Override
+                public void interactWith(ICWarsCellType cellType){
+
+                }
+            }
+            public ICWarsCellType getType(){return type;}
         }
+
     }

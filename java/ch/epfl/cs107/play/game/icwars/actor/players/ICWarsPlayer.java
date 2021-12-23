@@ -5,10 +5,8 @@ import ch.epfl.cs107.play.game.areagame.actor.Interactable;
 import ch.epfl.cs107.play.game.areagame.actor.Interactor;
 import ch.epfl.cs107.play.game.areagame.actor.Sprite;
 import ch.epfl.cs107.play.game.areagame.handler.AreaInteractionVisitor;
-import ch.epfl.cs107.play.game.icwars.ICWars;
 import ch.epfl.cs107.play.game.icwars.actor.ICWarsActor;
-import ch.epfl.cs107.play.game.icwars.actor.Unit;
-import ch.epfl.cs107.play.game.icwars.area.ICWarsArea;
+import ch.epfl.cs107.play.game.icwars.actor.players.unit.Unit;
 import ch.epfl.cs107.play.game.icwars.handler.ICWarsInteractionVisitor;
 import ch.epfl.cs107.play.math.DiscreteCoordinates;
 import ch.epfl.cs107.play.math.Vector;
@@ -16,7 +14,6 @@ import ch.epfl.cs107.play.window.Canvas;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 
 public class ICWarsPlayer extends ICWarsActor implements Interactor {
@@ -26,6 +23,7 @@ public class ICWarsPlayer extends ICWarsActor implements Interactor {
     protected ICWarsPlayer.ICWarsPlayerCurrentState currentState;
     private DiscreteCoordinates coords;
     private Unit unitOnWhichHeIsLocated;
+    private String spriteName;
 
 
     public ICWarsPlayer(Area area, DiscreteCoordinates position, faction camp, Unit... units) {
@@ -34,6 +32,12 @@ public class ICWarsPlayer extends ICWarsActor implements Interactor {
         registerUnits();
         this.currentState = ICWarsPlayerCurrentState.IDLE;
         this.coords = position;
+        if (camp == faction.ALLIE) {
+            spriteName = "icwars/allyCursor";
+        } else {
+            spriteName = "icwars/enemyCursor";
+        }
+        sprite = new Sprite(spriteName, 1.f, 1.f,this);
     }
 
     public void update(float deltaTime) {
@@ -151,7 +155,7 @@ public class ICWarsPlayer extends ICWarsActor implements Interactor {
      */
     @Override
     public boolean isCellInteractable() {
-        return false;
+        return true;
     }
 
     /**
@@ -194,10 +198,9 @@ public class ICWarsPlayer extends ICWarsActor implements Interactor {
         return units;
     }
 
-    public Unit getUnitOnWhichHeIsLocated() {
-        return unitOnWhichHeIsLocated;
+
+    public void setCurrentState(ICWarsPlayerCurrentState currentState){
+        this.currentState = currentState;
     }
-
-
 
 }

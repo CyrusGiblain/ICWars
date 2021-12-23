@@ -5,7 +5,9 @@ import ch.epfl.cs107.play.game.actor.ImageGraphics;
 import ch.epfl.cs107.play.game.actor.ShapeGraphics;
 import ch.epfl.cs107.play.game.actor.TextGraphics;
 import ch.epfl.cs107.play.game.areagame.io.ResourcePath;
-import ch.epfl.cs107.play.game.icwars.actor.Unit;
+import ch.epfl.cs107.play.game.icwars.actor.players.unit.Soldats;
+import ch.epfl.cs107.play.game.icwars.actor.players.unit.Tanks;
+import ch.epfl.cs107.play.game.icwars.actor.players.unit.Unit;
 import ch.epfl.cs107.play.game.icwars.area.ICWarsBehavior;
 import ch.epfl.cs107.play.math.*;
 import ch.epfl.cs107.play.math.Polygon;
@@ -16,11 +18,10 @@ import java.awt.*;
 
 
 public class ICWarsInfoPanel implements Graphics {
-
+    private Unit unit;
     private final float fontSize;
 
     private ICWarsBehavior.ICWarsCellType cellType;
-    private Unit unit;
 
     /// Sprite and text graphics line
     private final ShapeGraphics cellDetailsBackground, unitDetailsBackground;
@@ -71,14 +72,12 @@ public class ICWarsInfoPanel implements Graphics {
                TextAlign.Horizontal.LEFT, TextAlign.Vertical.MIDDLE, 1.0f, 3001f);
     }
 
-
+    public void setUnit(Unit unit){
+        this.unit = unit;
+    }
 
     public void setCurrentCell(ICWarsBehavior.ICWarsCellType cellType) {
         this.cellType = cellType;
-    }
-
-    public void setUnit(Unit unit) {
-        this.unit = unit;
     }
 
     @Override
@@ -86,11 +85,10 @@ public class ICWarsInfoPanel implements Graphics {
     	// Compute width, height and anchor
 		float width = canvas.getXScale();
 		float height = canvas.getYScale();
-
-		if (cellType != null)
-		    drawCellDetails(canvas, height, width);
-		if (unit != null)
-		    drawUnitDetails(canvas, height, width);
+        if (unit != null) {
+            drawUnitDetails(canvas, height, width);
+        }
+		if (cellType != null) drawCellDetails(canvas, height, width);
     }
 
     private void drawCellDetails(Canvas canvas, float height, float width) {
@@ -139,6 +137,8 @@ public class ICWarsInfoPanel implements Graphics {
         }
     }
 
+
+
     private void drawUnitDetails(Canvas canvas, float height, float width) {
         final Transform transform = Transform.I.translated(canvas.getPosition().add(width/4, -height/2));
        unitDetailsBackground.setRelativeTransform(transform);
@@ -147,7 +147,11 @@ public class ICWarsInfoPanel implements Graphics {
         final Transform nameTransform = Transform.I.translated(canvas.getPosition().add(width/4+.1f, -height/4));
 
       unitNameText.setRelativeTransform(nameTransform);
-       unitNameText.setText(unit.getName());
+      if(unit.getClass().equals(Tanks.class)){
+          unitNameText.setText("Tank");
+      } else if(unit.getClass().equals(Soldats.class)){
+          unitNameText.setText("Soldier");
+      }
         unitNameText.draw(canvas);
 
         final Transform characteristicsTransform = Transform.I.translated(canvas.getPosition().add(width/4+.1f, -height/4));
