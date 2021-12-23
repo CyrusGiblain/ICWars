@@ -2,6 +2,7 @@ package ch.epfl.cs107.play.game.icwars.area;
 
 import ch.epfl.cs107.play.game.areagame.AreaBehavior;
 import ch.epfl.cs107.play.game.areagame.actor.Interactable;
+import ch.epfl.cs107.play.game.areagame.actor.Interactor;
 import ch.epfl.cs107.play.game.areagame.handler.AreaInteractionVisitor;
 import ch.epfl.cs107.play.game.icwars.actor.players.ICWarsPlayer;
 import ch.epfl.cs107.play.game.icwars.handler.ICWarsInteractionVisitor;
@@ -10,7 +11,9 @@ import ch.epfl.cs107.play.window.Window;
 
 import java.util.List;
 
-public class ICWarsBehavior extends AreaBehavior {
+public class ICWarsBehavior extends AreaBehavior{
+
+    // The enumeration of the ICWarsCellType
     public enum ICWarsCellType {
         NONE(0, 0),          // Should never be used except
         ROAD(-16777216, 0), // the second value is the number of defense stars
@@ -24,17 +27,21 @@ public class ICWarsBehavior extends AreaBehavior {
         private final int stars;
 
         /**
-         * Default Cell constructor
+         * Cell constructor
          *
          * @param type
          * @param stars
          */
-
         ICWarsCellType(int type, int stars) {
             this.type = type;
             this.stars = stars;
         }
 
+        /**
+         *
+         * @param type (ICWarsCellType): The type of a ICWarsCellType
+         * @return the ICWarsCellType
+         */
         public static ICWarsBehavior.ICWarsCellType toType(int type) {
             for (ICWarsBehavior.ICWarsCellType ict : ICWarsBehavior.ICWarsCellType.values()) {
                 if (ict.type == type)
@@ -45,6 +52,9 @@ public class ICWarsBehavior extends AreaBehavior {
             return NONE;
         }
 
+        /**
+         * @return the String corresponding to the ICWarsCellType
+         */
         public String typeToString() {
             String name = null;
             switch (this) {
@@ -73,6 +83,9 @@ public class ICWarsBehavior extends AreaBehavior {
             return name;
         }
 
+        /**
+         * @return the ICWarsCellType
+         */
         public ICWarsCellType getType() {
             ICWarsCellType cellType = RIVER;
             switch (cellType) {
@@ -107,25 +120,22 @@ public class ICWarsBehavior extends AreaBehavior {
             return cellType;
         }
 
-
+        /**
+         * @return the number of defense stars
+         */
         public int getDefenseStar() {
             return stars;
         }
-
-        /**
-         * Get this Interactor's current occupying cells coordinates
-         *
-         * @return (List of DiscreteCoordinates). May be empty but not null
-         */
     }
 
     /**
-     * Default AreaBehavior Constructor
+     * ICWarsBehavior Constructor
      *
-     * @param window (Window): graphic context, not null
-     * @param name   (String): name of the behavior image, not null
+     * @param window (Window): The graphic context, not null
+     * @param name   (String): The name of the behavior image, not null
      */
     public ICWarsBehavior(Window window, String name) {
+
         super(window, name);
         int height = getHeight();
         int width = getWidth();
@@ -139,16 +149,17 @@ public class ICWarsBehavior extends AreaBehavior {
 
 
     public class ICWarsCell extends Cell implements Interactable {
+
+
         private final ICWarsBehavior.ICWarsCellType type;
 
         /**
-         * Default Cell constructor
+         * ICWarsCell constructor
          *
          * @param x    (int): x-coordinate of this cell
          * @param y    (int): y-coordinate of this cell
-         * @param type
+         * @param type (ICWarsCellType): The type of the cell
          */
-
         public ICWarsCell(int x, int y, ICWarsCellType type) {
             super(x, y);
             this.type = type;
@@ -171,25 +182,33 @@ public class ICWarsBehavior extends AreaBehavior {
             return true;
         }
 
-            @Override
-            public boolean takeCellSpace () {
-                return false;
-            }
-
-            @Override
-            public boolean isCellInteractable () {
-                return true;
-            }
-
-            @Override
-            public boolean isViewInteractable () {
-                return false;
-            }
-
-            @Override
-            public void acceptInteraction (AreaInteractionVisitor v){
-                ((ICWarsInteractionVisitor) v).interactWith(type.getType());
-
-            }
+        @Override
+        public boolean takeCellSpace () {
+            return false;
         }
+
+        @Override
+        public boolean isCellInteractable () {
+            return true;
+        }
+
+        @Override
+        public boolean isViewInteractable () {
+            return false;
+        }
+
+        @Override
+        public void acceptInteraction (AreaInteractionVisitor v){
+            ((ICWarsInteractionVisitor) v).interactWith(this);
+        }
+
+        public class ICWarsCellInteractionHandler implements ICWarsInteractionVisitor{
+           @Override
+            public void interactWith(ICWarsCellType cellType){
+           }
+        }
+        // Method to get the type of the cell
+        public ICWarsCellType getType(){return type;}
     }
+
+}

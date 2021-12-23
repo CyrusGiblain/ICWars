@@ -1,15 +1,16 @@
-package ch.epfl.cs107.play.game.icwars.actor.unit;
+package ch.epfl.cs107.play.game.icwars.actor.players.action;
 
 import ch.epfl.cs107.play.game.areagame.Area;
-import ch.epfl.cs107.play.game.icwars.actor.Unit;
 import ch.epfl.cs107.play.game.icwars.actor.players.ICWarsPlayer;
+import ch.epfl.cs107.play.game.icwars.actor.players.action.Action;
+import ch.epfl.cs107.play.game.icwars.actor.players.unit.Unit;
 import ch.epfl.cs107.play.game.icwars.area.ICWarsArea;
 import ch.epfl.cs107.play.window.Canvas;
 import ch.epfl.cs107.play.window.Keyboard;
 
-import static ch.epfl.cs107.play.game.icwars.actor.players.ICWarsPlayer.ICWarsPlayerCurrentState.NORMAL;
-//may be an interface
-public class Wait extends Action{
+
+public class Wait extends Action {
+
     private String name = "(W)ait";
     private int actionKey = 87;
     public Wait (Unit unit, ICWarsArea area) {
@@ -17,9 +18,7 @@ public class Wait extends Action{
     }
 
     @Override
-    public void draw(Canvas canvas) {
-
-    }
+    public void draw(Canvas canvas) {}
 
     @Override
     public void doAction(float dt, ICWarsPlayer player, Keyboard keyboard) {
@@ -31,6 +30,7 @@ public class Wait extends Action{
         unit.setIsUsed(true);
     }
 
+    @Override
     public String getName(){
         return this.name;
     }

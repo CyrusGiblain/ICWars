@@ -2,25 +2,29 @@ package ch.epfl.cs107.play.game.icwars.actor.players;
 
 
 import ch.epfl.cs107.play.game.areagame.Area;
-import ch.epfl.cs107.play.game.icwars.actor.Unit;
-import ch.epfl.cs107.play.game.icwars.actor.unit.Action;
-import ch.epfl.cs107.play.game.icwars.actor.unit.Attack;
+import ch.epfl.cs107.play.game.icwars.actor.players.unit.Unit;
+import ch.epfl.cs107.play.game.icwars.actor.players.action.Action;
+import ch.epfl.cs107.play.game.icwars.area.ICWarsArea;
 import ch.epfl.cs107.play.math.DiscreteCoordinates;
-import ch.epfl.cs107.play.window.Button;
 import ch.epfl.cs107.play.window.Keyboard;
 
 import java.util.ArrayList;
 
 import static ch.epfl.cs107.play.game.icwars.actor.players.ICWarsPlayer.ICWarsPlayerCurrentState.*;
-import static javax.swing.UIManager.get;
 
 public class AIPlayer extends ICWarsPlayer {
-    private ArrayList<Unit> Enemyunits;
-    private ArrayList<Unit> AIControlledunits;
+    private ArrayList<Unit> Enemyunits = new ArrayList<>();
+    private ArrayList<Unit> AIControlledunits = new ArrayList<>();
     Keyboard keyboard = getOwnerArea().getKeyboard();
+    private faction camp;
 
-    public AIPlayer(Area area, DiscreteCoordinates position, faction camp, Unit... units) {
+    public AIPlayer(ICWarsArea area, DiscreteCoordinates position, faction camp, Unit... units) {
         super(area, position, camp, units);
+        this.camp = camp;
+        for(int i = 0; i < area.units.size(); ++i){
+            if(area.units.get(i).getCamp() == camp) AIControlledunits.add(area.units.get(i));
+            else {Enemyunits.add(area.units.get(i));}
+        }
     }
 
     @Override
@@ -81,7 +85,7 @@ public class AIPlayer extends ICWarsPlayer {
             AICurrentlyControlledunit = AIControlledunits.get(j);
             for(int l = 0; l< Distances.size(); ++l) {
                 //if(Distances.get(l) < Math.sqrt(2 * AICurrentlyControlledunit.radius * AICurrentlyControlledunit.radius))
-                    unitsInRange.add(Enemyunits.get(l));
+                unitsInRange.add(Enemyunits.get(l));
             }
             smallestHp = findSmallestHp(unitsInRange);
             // if there are unitsInRange
@@ -90,20 +94,20 @@ public class AIPlayer extends ICWarsPlayer {
                 double xDistance = Math.abs(AICurrentlyControlledunit.getPosition().x - smallestHp.getPosition().x);
                 double yDistance = Math.abs(AICurrentlyControlledunit.getPosition().y - smallestHp.getPosition().y);
                 //if (xDistance <= AICurrentlyControlledunit.radius && yDistance <= AICurrentlyControlledunit.radius) {
-                    DiscreteCoordinates LowLifeEnemyPosition = new DiscreteCoordinates((int) smallestHp.getPosition().x, (int) smallestHp.getPosition().y);
-                    act.equals(AICurrentlyControlledunit.getPossibleActions().get(0));
-                    waitFor(2, 48);
-                    act.doAutoAction(8, this, smallestHp);
-                }
-            //} else {
-                // if the distance is greater we move to the closest Unit
-                double xDistance = Enemyunits.get(position).getPosition().x;
-                double yDistance = Enemyunits.get(position).getPosition().y;
-                DiscreteCoordinates newPosition = new DiscreteCoordinates((int)xDistance, (int)yDistance);
-                AICurrentlyControlledunit.changePosition(newPosition);
-                AICurrentlyControlledunit.centerCamera();
+                DiscreteCoordinates LowLifeEnemyPosition = new DiscreteCoordinates((int) smallestHp.getPosition().x, (int) smallestHp.getPosition().y);
+                act.equals(AICurrentlyControlledunit.getPossibleActions().get(0));
+                waitFor(2, 48);
+                act.doAutoAction(8, this, smallestHp);
             }
+            //} else {
+            // if the distance is greater we move to the closest Unit
+            double xDistance = Enemyunits.get(position).getPosition().x;
+            double yDistance = Enemyunits.get(position).getPosition().y;
+            DiscreteCoordinates newPosition = new DiscreteCoordinates((int)xDistance, (int)yDistance);
+            AICurrentlyControlledunit.changePosition(newPosition);
+            AICurrentlyControlledunit.centerCamera();
         }
+    }
     //}
     public Unit findSmallestHp(ArrayList<Unit> units) {
         int j = 0;
@@ -154,4 +158,6 @@ public class AIPlayer extends ICWarsPlayer {
         }
         return false;
     }
+
+
 }

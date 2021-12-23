@@ -1,0 +1,3 @@
+Nous avons adhéré à l'architecture suggérée sans ajouts notables.
+
+Nous ne parvenons pas cependant à faire fonctionner la classe AIPlayer.

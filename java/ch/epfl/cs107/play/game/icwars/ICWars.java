@@ -1,10 +1,9 @@
 package ch.epfl.cs107.play.game.icwars;
 
 import ch.epfl.cs107.play.game.areagame.AreaGame;
-import ch.epfl.cs107.play.game.icwars.actor.ICWarsActor;
-import ch.epfl.cs107.play.game.icwars.actor.Soldats;
-import ch.epfl.cs107.play.game.icwars.actor.Tanks;
-import ch.epfl.cs107.play.game.icwars.actor.Unit;
+import ch.epfl.cs107.play.game.icwars.actor.players.unit.Soldats;
+import ch.epfl.cs107.play.game.icwars.actor.players.unit.Tanks;
+import ch.epfl.cs107.play.game.icwars.actor.players.unit.Unit;
 import ch.epfl.cs107.play.game.icwars.actor.players.ICWarsPlayer;
 import ch.epfl.cs107.play.game.icwars.actor.players.RealPlayer;
 import ch.epfl.cs107.play.game.icwars.area.ICWarsArea;
@@ -21,6 +20,7 @@ import java.util.*;
 import static ch.epfl.cs107.play.game.icwars.actor.ICWarsActor.faction.*;
 
 public class ICWars extends AreaGame {
+
     public ICWarsArea area;
     //private RealPlayer player;
     private List<ICWarsPlayer> listOfPlayers = new ArrayList<>();
@@ -48,18 +48,18 @@ public class ICWars extends AreaGame {
         Button tab = keyboard.get(Keyboard.TAB);
         Button G = keyboard.get(Keyboard.G);
 
-            //if (areaIndex == 0) {
-            //if (keyN.isReleased()) {
-            //     switchArea();
-            //}
+        //if (areaIndex == 0) {
+        //if (keyN.isReleased()) {
+        //     switchArea();
+        //}
 
-            if (keyR.isReleased()) {
-                listOfPlayers.clear();
-                initArea(areas[0]);
-                listOfPlayersWaitingForTheCurrentRound.clear();
-                listOfPlayersWaitingForNextTurn.clear();
-                icWarsCurrentState = ICWarsCurrentState.INIT;
-            }
+        if (keyR.isReleased()) {
+            listOfPlayers.clear();
+            initArea(areas[0]);
+            listOfPlayersWaitingForTheCurrentRound.clear();
+            listOfPlayersWaitingForNextTurn.clear();
+            icWarsCurrentState = ICWarsCurrentState.INIT;
+        }
 
 
         switch (icWarsCurrentState) {
@@ -78,7 +78,6 @@ public class ICWars extends AreaGame {
                     icWarsCurrentState = ICWarsCurrentState.END_TURN;
 
                 } else {
-
                     currentPlayer = listOfPlayersWaitingForTheCurrentRound.get(0);
                     listOfPlayersWaitingForTheCurrentRound.remove(0);
                     icWarsCurrentState = ICWarsCurrentState.START_PLAYER_TURN;
@@ -102,7 +101,7 @@ public class ICWars extends AreaGame {
             case END_PLAYER_TURN:
                 if (currentPlayer.isDefeated()) {
                     area.unregisterActor(currentPlayer);
-                } else {
+                } else if(tab.isReleased()){
                     listOfPlayersWaitingForNextTurn.add(currentPlayer);
                     for (int i = 0; i < currentPlayer.getUnits().size(); ++i) {
                         currentPlayer.getUnits().get(i).setIsUsed(false);
@@ -133,22 +132,26 @@ public class ICWars extends AreaGame {
 
             case END:
                 switchArea();
-                }
         }
-        //EFFECTUER LA RETOUCHE GRAPHIQUE.
+    }
 
-        //if (keyboard.get(Keyboard.U).isReleased()) { ((RealPlayer)player).selectUnit(0);} // 0, 1 ...
+    // Previous method used to manually select a unit
+    //if (keyboard.get(Keyboard.U).isReleased()) { ((RealPlayer)player).selectUnit(0);} // 0, 1 ...
 
     @Override
     public String getTitle() {
         return "ICWars";
     }
 
+    /**
+     * Method to create the 2 ares
+     */
     public void createAreas(){
         addArea(new Level0());
         addArea(new Level1());
     }
 
+    @Override
     public boolean begin(Window window, FileSystem fileSystem) {
         if (super.begin(window, fileSystem)) {
             createAreas();
@@ -159,16 +162,19 @@ public class ICWars extends AreaGame {
         return false;
     }
 
+    /**
+     * Method to initialise an area
+     *
+     * @param areaKey (String): The String that designs an area
+     */
     private void initArea(String areaKey) {
 
-        ICWarsArea area = (ICWarsArea) setCurrentArea(areaKey, true);
+        area = (ICWarsArea) setCurrentArea(areaKey, true);
 
         DiscreteCoordinates coordsALLY = area.getPlayerSpawnPosition();
         DiscreteCoordinates coordsEnnemy1 = area.getEnemySpawnPosition();
-        //DiscreteCoordinates coordsEnnemy2 = area.getEnemySpawnPosition2();
-        //DiscreteCoordinates coordsEnnemy3 = area.getEnemySpawnPosition3();
 
-
+        //Previous data
         //DiscreteCoordinates coordsSoldat = new DiscreteCoordinates(5,6);
         //DiscreteCoordinates coordsTank = new DiscreteCoordinates(3, 2);
         //player = new RealPlayer(area, coords, ALLIE, new Soldats(area, coordsSoldat, ALLIE), new Tanks(area, coordsTank, ALLIE));
@@ -182,56 +188,40 @@ public class ICWars extends AreaGame {
         DiscreteCoordinates coordsOfTheTankOfTheSecondRealPlayer = new DiscreteCoordinates(8, 5);
         DiscreteCoordinates coordsOfTheSoldatOfTheSecondRealPlayer = new DiscreteCoordinates(9, 5);
 
-        //DiscreteCoordinates coordsOfTheTankOfTheThirdRealPlayer = new DiscreteCoordinates(4, 1);
-        //DiscreteCoordinates coordsOfTheSoldatOfTheThirdRealPlayer = new DiscreteCoordinates(5, 1);
-
-        //DiscreteCoordinates coordsOfTheTankOfTheFourthRealPlayer = new DiscreteCoordinates(6, 1);
-        //DiscreteCoordinates coordsOfTheSoldatOfTheFourthRealPlayer = new DiscreteCoordinates(7, 1);
-        Unit tankFirstPlayer = new Tanks(area, coordsOfTheTankOfTheFirstRealPlayer, ALLIE);
-        Unit soldatFirstPlayer = new Soldats(area, coordsOfTheSoldatOfTheFirstRealPlayer, ALLIE);
-        firstPlayerOfTheList = new RealPlayer(area, coordsALLY, ALLIE, tankFirstPlayer,
-                soldatFirstPlayer);
+        Tanks tankFirstPlayer = new Tanks(area, coordsOfTheTankOfTheFirstRealPlayer, ALLIE);
+        Soldats soldatFirstPlayer = new Soldats(area, coordsOfTheSoldatOfTheFirstRealPlayer, ALLIE);
+        firstPlayerOfTheList = new RealPlayer(area, coordsALLY, ALLIE, tankFirstPlayer, soldatFirstPlayer);
 
 
-        Unit tankSecondPlayer = new Tanks(area, coordsOfTheTankOfTheSecondRealPlayer, ENNEMIE);
-        Unit soldatSecondPlayer = new Soldats(area, coordsOfTheSoldatOfTheSecondRealPlayer, ENNEMIE);
-        secondPlayerOfTheList = new RealPlayer(area, coordsEnnemy1, ENNEMIE, tankSecondPlayer,
-                soldatSecondPlayer);
-        units.add(tankSecondPlayer);
-        units.add(soldatSecondPlayer);
+        Tanks tankSecondPlayer = new Tanks(area, coordsOfTheTankOfTheSecondRealPlayer, ENNEMIE);
+        Soldats soldatSecondPlayer = new Soldats(area, coordsOfTheSoldatOfTheSecondRealPlayer, ENNEMIE);
+        secondPlayerOfTheList = new RealPlayer(area, coordsEnnemy1, ENNEMIE, tankSecondPlayer, soldatSecondPlayer);
         area.units.add(tankFirstPlayer);
         area.units.add(soldatFirstPlayer);
+        area.units.add(tankSecondPlayer);
         area.units.add(soldatSecondPlayer);
-        area.units.add(soldatSecondPlayer);
-
-        //thirdPlayerOfTheList = new RealPlayer(area, coordsEnnemy2, ENNEMIE2, new Tanks(area, coordsOfTheTankOfTheThirdRealPlayer, ENNEMIE2),
-                //new Soldats(area, coordsOfTheSoldatOfTheThirdRealPlayer, ENNEMIE2));
-
-        //fourthPlayerOfTheList = new RealPlayer(area, coordsEnnemy3, ENNEMIE3, new Tanks(area, coordsOfTheTankOfTheFourthRealPlayer, ENNEMIE3),
-                //new Soldats(area, coordsOfTheSoldatOfTheFourthRealPlayer, ENNEMIE3));
 
         listOfPlayers.add(firstPlayerOfTheList);
         listOfPlayers.add(secondPlayerOfTheList);
-        //listOfPlayers.add(thirdPlayerOfTheList);
-        //listOfPlayers.add(fourthPlayerOfTheList);
 
         firstPlayerOfTheList.centerCamera();
         firstPlayerOfTheList.enterArea(area, coordsALLY);
 
         secondPlayerOfTheList.enterArea(area, coordsEnnemy1);
 
-        //thirdPlayerOfTheList.enterArea(area, coordsEnnemy2);
-        //fourthPlayerOfTheList.enterArea(area, coordsEnnemy3);
-
+        //Previous units
         //Tanks tank = new Tanks(area, new DiscreteCoordinates(3, 4), ALLIE);
         //Soldats soldat = new Soldats(area, new DiscreteCoordinates(5, 6), ALLIE);
         //units.add(tank);
         //units.add(soldat);
     }
+
+    // Method to end the game
     public void end(){
         super.end();
     }
 
+    //Method to switch from the first area to the second
     protected void switchArea() {
         //player.leaveArea();
         for (ICWarsPlayer player : listOfPlayersWaitingForNextTurn) {
@@ -239,13 +229,21 @@ public class ICWars extends AreaGame {
         }
         areaIndex = (areaIndex==0) ? 1 : 0;
         ICWarsArea currentArea = (ICWarsArea) setCurrentArea(areas[areaIndex], false);
+
+        //It's the previous player we used
         //player.enterArea(currentArea, currentArea.getPlayerSpawnPosition());
+
         for (ICWarsPlayer player : listOfPlayers) {
             player.enterArea(area, currentArea.getPlayerSpawnPosition());
         }
     }
+
+    /**
+     * @return the ArrayList of the units
+     */
     public ArrayList<Unit> getUnits(){return units;}
 
+    // The enumeration that designs the current state of ICWars
     public enum ICWarsCurrentState {
         INIT,
         CHOOSE_PLAYER,
@@ -255,6 +253,4 @@ public class ICWars extends AreaGame {
         END_TURN,
         END;
     }
-
-
 }

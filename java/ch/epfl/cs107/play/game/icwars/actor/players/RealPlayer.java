@@ -5,16 +5,13 @@ import ch.epfl.cs107.play.game.areagame.actor.Interactable;
 import ch.epfl.cs107.play.game.areagame.actor.Orientation;
 import ch.epfl.cs107.play.game.areagame.actor.Sprite;
 import ch.epfl.cs107.play.game.areagame.handler.AreaInteractionVisitor;
-import ch.epfl.cs107.play.game.icwars.actor.Soldats;
-import ch.epfl.cs107.play.game.icwars.actor.Tanks;
-import ch.epfl.cs107.play.game.icwars.actor.Unit;
-import ch.epfl.cs107.play.game.icwars.actor.unit.Action;
-import ch.epfl.cs107.play.game.icwars.actor.unit.Attack;
-import ch.epfl.cs107.play.game.icwars.actor.unit.Wait;
+import ch.epfl.cs107.play.game.icwars.actor.players.unit.Unit;
+import ch.epfl.cs107.play.game.icwars.actor.players.action.Action;
+import ch.epfl.cs107.play.game.icwars.actor.players.action.Attack;
+import ch.epfl.cs107.play.game.icwars.actor.players.action.Wait;
 import ch.epfl.cs107.play.game.icwars.area.ICWarsArea;
 import ch.epfl.cs107.play.game.icwars.area.ICWarsBehavior;
-import ch.epfl.cs107.play.game.icwars.gui.ICWarsActionsPanel;
-import ch.epfl.cs107.play.game.icwars.gui.ICWarsInfoPanel;
+import ch.epfl.cs107.play.game.icwars.area.ICWarsBehavior.ICWarsCellType;
 import ch.epfl.cs107.play.game.icwars.gui.ICWarsPlayerGUI;
 import ch.epfl.cs107.play.game.icwars.handler.ICWarsInteractionVisitor;
 import ch.epfl.cs107.play.math.DiscreteCoordinates;
@@ -29,19 +26,22 @@ public class RealPlayer extends ICWarsPlayer {
     private float hp;
     private Sprite sprite;
     private String spriteName;
-    protected List<Unit> memory;
     private ICWarsPlayerGUI icWarsPlayerGUI;
-    private boolean theSelectedUnitHasBeenUsed = false;
-    /// Animation duration in frame number
-    private final static int MOVE_DURATION = 8;
+    // Animation duration in frame number
+    //to Change before rendu
+    private final static int MOVE_DURATION = 3;
     private ICWarsArea area;
-    private Action actToExecute;
-    ICWarsInfoPanel ICWarsInfoPanel;
-    ICWarsActionsPanel panel;
-    ICWarsBehavior.ICWarsCellType cellType ;
+    private Action action;
+    private ICWarsCellType cellType;
+
+
     /**
-     * Demo actor
+     * Constructor of RealPlayer
      *
+     * @param owner    (ICWarsArea): The ICWarsArea of the RealPlayer
+     * @param position (DiscreteCoordinates): The initial position of the RealPLayer
+     * @param camp     (faction): The faction of the RealPlayer
+     * @param units    (Unit...): The units owned by the RealPlayer
      */
     public RealPlayer(ICWarsArea owner, DiscreteCoordinates position, faction camp, Unit... units) {
         super(owner, position, camp, units);
@@ -52,12 +52,12 @@ public class RealPlayer extends ICWarsPlayer {
             spriteName = "icwars/enemyCursor";
         }
         sprite = new Sprite(spriteName, 1.f, 1.f,this);
-        this.icWarsPlayerGUI = new ICWarsPlayerGUI(1.0f, this);
+        this.icWarsPlayerGUI = new ICWarsPlayerGUI(10.0f, this);
         resetMotion();
     }
 
     /**
-     * Center the camera on the player
+     * Center the camera on the RealPlayer
      */
     public void centerCamera() {
         getOwnerArea().setViewCandidate(this);
@@ -67,8 +67,6 @@ public class RealPlayer extends ICWarsPlayer {
     public void update(float deltaTime) {
 
         super.update(deltaTime);
-
-        System.out.println(currentState);
 
         Keyboard keyboard1= getOwnerArea().getKeyboard();
 
@@ -83,22 +81,21 @@ public class RealPlayer extends ICWarsPlayer {
                 break;
 
             case NORMAL:
-
                 canMove();
 
                 centerCamera();
 
                 if (enter.isReleased()) {
                     for (Unit unit : this.getUnits()) {
-                       if (unit.getCurrentCells().equals(this.getCurrentCells())) {
-                           currentState = ICWarsPlayerCurrentState.SELECT_CELL;
-                       }
+                        if (unit.getCurrentCells().equals(this.getCurrentCells())) {
+                            currentState = ICWarsPlayerCurrentState.SELECT_CELL;
+                        }
 
-                   }
+                    }
                 }
-                if (tab.isReleased()) {
-                    currentState = ICWarsPlayerCurrentState.IDLE;
-                }
+                // if(tab.isReleased()) {
+                //  currentState = ICWarsPlayerCurrentState.IDLE;
+                //}
                 break;
 
             case SELECT_CELL:
@@ -126,45 +123,29 @@ public class RealPlayer extends ICWarsPlayer {
                         currentState = ICWarsPlayerCurrentState.ACTION_SELECTION;
                     }
                 }
-
                 if (tab.isReleased()) {
-                    currentState = ICWarsPlayerCurrentState.NORMAL;
+                    currentState = ICWarsPlayerCurrentState.IDLE;
                 }
                 break;
 
             case ACTION_SELECTION:
-                if (selectedUnit instanceof Tanks) {
-                    for (int i = 0; i < selectedUnit.getPossibleActions().size(); ++i) {
-                        Action action = selectedUnit.getPossibleActions().get(i);
-                        if (A.isReleased()) {
-                            System.out.println(" A SELECTIONNEE");
-                            actToExecute = new Attack(this.getSelectedUnit(), this.area);
-                            currentState = ICWarsPlayerCurrentState.ACTION;
-                        } else if (W.isReleased()) {
-                            System.out.println(("W SELECTIONNEE"));
-                            actToExecute = new Wait(this.getSelectedUnit(), this.area);
-                            currentState = ICWarsPlayerCurrentState.NORMAL;
-                        }
-
-
+                for (int i = 0; i < selectedUnit.getPossibleActions().size(); ++i) {
+                    action= selectedUnit.getPossibleActions().get(i);
+                    if (A.isReleased()) {
+                        System.out.println(" A SELECTIONNEE");
+                        action = new Attack(this.getSelectedUnit(), this.area);
+                        currentState = ICWarsPlayerCurrentState.ACTION;
+                    } else if (W.isReleased()) {
+                        System.out.println(("W SELECTIONNEE"));
+                        action = new Wait(this.getSelectedUnit(), this.area);
+                        currentState = ICWarsPlayerCurrentState.NORMAL;
                     }
-                } else if (selectedUnit instanceof Soldats) {
-                    for (Action act : ((Soldats) selectedUnit).getPossibleActions()) {
-                        if (W.isReleased()) {
-                            currentState = ICWarsPlayerCurrentState.ACTION;
-                            if (act instanceof Attack) {
-                                actToExecute = new Attack(this.getSelectedUnit(), this.area);
-                            } else {
-                                actToExecute = new Wait(this.getSelectedUnit(), this.area);
-                            }
-                        }
-                    }
-            }
+                }
                 break;
 
             case ACTION:
                 float dt = 0;
-               actToExecute.doAction(dt, this, keyboard1);
+                action.doAction(dt, this, keyboard1);
                 break;
 
         }
@@ -184,7 +165,7 @@ public class RealPlayer extends ICWarsPlayer {
     }
 
     /**
-     * Leave an area by unregister this player
+     * Leave an area by unregistering this player
      */
     public void leaveArea(){
         getOwnerArea().unregisterActor(this);
@@ -206,8 +187,10 @@ public class RealPlayer extends ICWarsPlayer {
     @Override
     public void draw(Canvas canvas) {
         sprite.draw(canvas);
-        if (currentState == ICWarsPlayerCurrentState.MOVE_UNIT) {
-            icWarsPlayerGUI.draw(canvas);
+        icWarsPlayerGUI.draw(canvas);
+
+        if(currentState == ICWarsPlayerCurrentState.ACTION && action != null){
+            action.draw(canvas);
         }
     }
 
@@ -250,16 +233,17 @@ public class RealPlayer extends ICWarsPlayer {
         return false;
     }
 
-
     @Override
     public void interactWith(Interactable other) {
         ICWarsPlayerInteractionHandler handler = new ICWarsPlayerInteractionHandler();
         other.acceptInteraction(handler);
     }
-
     @Override
     public void acceptInteraction(AreaInteractionVisitor v) {
         ((ICWarsInteractionVisitor)v).interactWith(this); }
+
+
+    // Method that means that the RealPlayer can move where he wants inside the area
 
     public void canMove() {
 
@@ -271,42 +255,69 @@ public class RealPlayer extends ICWarsPlayer {
         moveIfPressed(Orientation.DOWN, keyboard2.get(Keyboard.DOWN));
     }
 
+    // Method that means that the RealPlayer can only move inside his range
     public void canMoveOnlyInTheRange() {
 
         Keyboard keyboard2 = getOwnerArea().getKeyboard();
 
         if (selectedUnit.getFromX() - getCurrentMainCellCoordinates().x < getSelectedUnit().getRadius())
-        moveIfPressed(Orientation.LEFT, keyboard2.get(Keyboard.LEFT));
+            moveIfPressed(Orientation.LEFT, keyboard2.get(Keyboard.LEFT));
 
         if (getCurrentMainCellCoordinates().y - selectedUnit.getFromY() < getSelectedUnit().getRadius())
-        moveIfPressed(Orientation.UP, keyboard2.get(Keyboard.UP));
+            moveIfPressed(Orientation.UP, keyboard2.get(Keyboard.UP));
 
         if (getCurrentMainCellCoordinates().x - selectedUnit.getFromX() < getSelectedUnit().getRadius())
-        moveIfPressed(Orientation.RIGHT, keyboard2.get(Keyboard.RIGHT));
+            moveIfPressed(Orientation.RIGHT, keyboard2.get(Keyboard.RIGHT));
 
         if (selectedUnit.getFromY() - getCurrentMainCellCoordinates().y < getSelectedUnit().getRadius())
-        moveIfPressed(Orientation.DOWN, keyboard2.get(Keyboard.DOWN));
+            moveIfPressed(Orientation.DOWN, keyboard2.get(Keyboard.DOWN));
     }
 
+    /**
+     * @return the faction of the RealPlayer
+     */
     public faction getCamp() {
         return camp;
     }
 
+
+    // The handler class
     private class ICWarsPlayerInteractionHandler implements ICWarsInteractionVisitor {
-
-
         @Override
         public void interactWith(Unit unit) {
+            icWarsPlayerGUI.setCellUnit(unit);
             if (getCamp().equals(unit.getCamp()) && currentState == ICWarsPlayerCurrentState.SELECT_CELL) {
                 selectedUnit = unit;
+                icWarsPlayerGUI.setUnit(unit);
+                currentState = ICWarsPlayerCurrentState.MOVE_UNIT;
             }
         }
-    }
 
+        @Override
+        public void interactWith(ICWarsBehavior.ICWarsCell cell){
+            cellType = cell.getType();
+        }
+
+        //public void interactWith(ICWarsBehavior.ICWarsCellType cellType){}
+
+    }
+    // Method we used previously to manually select a unit
     public void selectUnit(int index) {
         if (index < units.size()) {
             this.selectedUnit = units.get(index);
         }
     }
-}
 
+    @Override
+    public ICWarsPlayerCurrentState getCurrentState(){
+        return currentState;
+    }
+
+    /**
+     * @return the cell type
+     */
+    public ICWarsCellType getCellType(){
+        return cellType;
+    }
+
+}

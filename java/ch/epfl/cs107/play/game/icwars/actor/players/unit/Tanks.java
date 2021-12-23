@@ -1,30 +1,26 @@
-package ch.epfl.cs107.play.game.icwars.actor;
+package ch.epfl.cs107.play.game.icwars.actor.players.unit;
 
-import ch.epfl.cs107.play.game.areagame.Area;
-import ch.epfl.cs107.play.game.areagame.actor.Orientation;
 import ch.epfl.cs107.play.game.areagame.actor.Sprite;
-import ch.epfl.cs107.play.game.areagame.handler.AreaInteractionVisitor;
-import ch.epfl.cs107.play.game.icwars.actor.unit.Action;
-import ch.epfl.cs107.play.game.icwars.actor.unit.Attack;
-import ch.epfl.cs107.play.game.icwars.actor.unit.Wait;
+import ch.epfl.cs107.play.game.icwars.actor.ICWarsActor;
+import ch.epfl.cs107.play.game.icwars.actor.players.action.Action;
+import ch.epfl.cs107.play.game.icwars.actor.players.action.Attack;
+import ch.epfl.cs107.play.game.icwars.actor.players.action.Wait;
 import ch.epfl.cs107.play.game.icwars.area.ICWarsArea;
-import ch.epfl.cs107.play.game.icwars.handler.ICWarsInteractionVisitor;
 import ch.epfl.cs107.play.math.DiscreteCoordinates;
 import ch.epfl.cs107.play.math.Vector;
 import ch.epfl.cs107.play.window.Canvas;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import static ch.epfl.cs107.play.game.icwars.actor.ICWarsActor.faction.ALLIE;
 import static ch.epfl.cs107.play.game.icwars.actor.ICWarsActor.faction.ENNEMIE;
-//import static ch.epfl.cs107.play.game.icwars.actor.ICWarsActor.faction.ENNEMIE2;
-//import static ch.epfl.cs107.play.game.icwars.actor.ICWarsActor.faction.ENNEMIE3;
+
 public class Tanks extends Unit{
+
     private int inflictedDamage = 7;
     private int rayon = 4;
-    private int hp;
-    private int maxHp = 10;
+    private int hp = getHp();
+    private final int maxHp = 10;
     private Sprite tankAllie = new Sprite("icwars/friendlyTank", 1.5f, 1.5f,  this, null, new Vector(-0.25f, -0.25f));
     private Sprite tankEnnemi = new Sprite("icwars/enemyTank", 1.5f, 1.5f, this, null, new Vector(-0.25f, -0.25f));
     private ICWarsArea area;
@@ -33,20 +29,29 @@ public class Tanks extends Unit{
     private List<Action> listOfActions;
 
     /**
-     * Default MovableAreaEntity constructor
+     * Tanks constructor
      *
-     * @param area        (Area): Owner area. Not null
-     * @param position    (Coordinate): Initial position of the entity. Not null
-     * @param faction
+     * @param area        (Area): The area the tank will be displayed in
+     * @param position    (DiscreteCoordinate): The initial position of the tank
+     * @param faction     (faction): The faction of the tank
      */
-    public Tanks(ICWarsArea area,  DiscreteCoordinates position, ICWarsActor.faction faction) {
+    public Tanks(ICWarsArea area,  DiscreteCoordinates position, faction faction) {
         super(area, position, faction, 4);
-
-        int hp = maxHp;
+        this.setHp(this, maxHp);
         this.camp = faction;
         this.area = area;
         this.listOfActions = List.of(new Attack(this, this.area), new Wait(this, this.area));
     }
+
+    @Override
+    public String getName() {
+        if (camp.equals(ALLIE)) {
+            return "icwars/friendlyTank";
+        } else {
+            return "icwars/enemyTank";
+        }
+    }
+
 
     @Override
     public void draw(Canvas canvas) {
@@ -67,14 +72,16 @@ public class Tanks extends Unit{
         }
     }
 
-    @Override
-    public int getDamage() {
-        return inflictedDamage;
+    /**
+     * @return the HP of the tank
+     */
+    public int getHp(){
+        return hp;
     }
 
     @Override
-    public int movement() {
-        return this.rayon;
+    public int getDamage() {
+        return inflictedDamage;
     }
 
     @Override
@@ -99,24 +106,16 @@ public class Tanks extends Unit{
     }
 
     /**
-     * Call directly the interaction on this if accepted
-     *
-     * @param v (AreaInteractionVisitor) : the visitor
+     * @return the Sprite of the ally tank
      */
-    @Override
-    public void acceptInteraction(AreaInteractionVisitor v) {
-        ((ICWarsInteractionVisitor)v).interactWith(this);
-    }
-
     public Sprite getTankAllie() {
         return tankAllie;
     }
 
+    /**
+     * @return the Sprite of the enemy tank
+     */
     public Sprite getTankEnnemi() {
         return tankEnnemi;
-    }
-
-    public List<Action> getListOfActions() {
-        return listOfActions;
     }
 }
