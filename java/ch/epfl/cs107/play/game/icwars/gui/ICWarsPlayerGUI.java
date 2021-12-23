@@ -22,7 +22,7 @@ public class ICWarsPlayerGUI implements Graphics {
 
     public ICWarsPlayerGUI(float cameraScaleFactor, ICWarsPlayer player) {
         this.player = player;
-         actionsPanel = new ICWarsActionsPanel(cameraScaleFactor);
+        this.actionsPanel = new ICWarsActionsPanel(cameraScaleFactor);
         this.infoPanel = new ICWarsInfoPanel(cameraScaleFactor);
     }
 
@@ -36,14 +36,15 @@ public class ICWarsPlayerGUI implements Graphics {
         DiscreteCoordinates destination = player.getCurrentCells().get(0);
 
         Unit selectedUnit = player.getSelectedUnit();
-        if(selectedUnit != null) {
+        if(selectedUnit != null && !selectedUnit.theUnitHasBeenUsed())
             selectedUnit.drawRangeAndPathTo(destination, canvas);
-        }
+
         if (player.getCurrentState() == ICWarsPlayer.ICWarsPlayerCurrentState.NORMAL ||
-                player.getCurrentState() == ICWarsPlayer.ICWarsPlayerCurrentState.SELECT_CELL) {
-                if(cellUnit != null) infoPanel.setUnit(cellUnit);
-                infoPanel.setCurrentCell(((RealPlayer)player).getCellType());
-                infoPanel.draw(canvas);
+            player.getCurrentState() == ICWarsPlayer.ICWarsPlayerCurrentState.SELECT_CELL||
+            player.getCurrentState() == ICWarsPlayer.ICWarsPlayerCurrentState.MOVE_UNIT) {
+            infoPanel.setUnit(cellUnit);
+            infoPanel.setCurrentCell(((RealPlayer)player).getCellType());
+            infoPanel.draw(canvas);
         }
 
         if(player.getCurrentState() == ICWarsPlayer.ICWarsPlayerCurrentState.ACTION_SELECTION){
@@ -51,7 +52,7 @@ public class ICWarsPlayerGUI implements Graphics {
             actionsPanel.draw(canvas);
         }
     }
-    public void setCellUnit(Unit cellUnit){this.cellUnit = cellUnit;}
+    public void setCellUnit(Unit cellUnit){infoPanel.setUnit(cellUnit);}
     public void setUnit(Unit unit){this.unit = unit;}
 }
 //Le RealPlayer devra communiquer, quand il y a intéraction, les infos sur la cellule sur laquelle il se trouve.

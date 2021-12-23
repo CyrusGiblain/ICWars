@@ -54,7 +54,7 @@ public class RealPlayer extends ICWarsPlayer {
             spriteName = "icwars/enemyCursor";
         }
         sprite = new Sprite(spriteName, 1.f, 1.f,this);
-        this.icWarsPlayerGUI = new ICWarsPlayerGUI(1.0f, this);
+        this.icWarsPlayerGUI = new ICWarsPlayerGUI(10.0f, this);
         resetMotion();
     }
 
@@ -189,7 +189,7 @@ public class RealPlayer extends ICWarsPlayer {
     @Override
     public void draw(Canvas canvas) {
         sprite.draw(canvas);
-            icWarsPlayerGUI.draw(canvas);
+        icWarsPlayerGUI.draw(canvas);
 
         if(currentState == ICWarsPlayerCurrentState.ACTION && action != null){
             action.draw(canvas);
@@ -287,7 +287,7 @@ public class RealPlayer extends ICWarsPlayer {
                 icWarsPlayerGUI.setUnit(unit);
                 currentState = ICWarsPlayerCurrentState.MOVE_UNIT;
             }
-            icWarsPlayerGUI.setCellUnit(selectedUnit);
+            icWarsPlayerGUI.setCellUnit(unit);
         }
 
         @Override
