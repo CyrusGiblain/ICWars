@@ -165,8 +165,6 @@ public abstract class Unit extends ICWarsActor implements Interactable, Interact
         }
         else {
             updateRange(radius, newPosition);
-        }
-        if (changePosition) {
             unitIsUsed = false;
             if (this instanceof Tanks) {
                 if (this.camp == faction.ALLIE) {
@@ -224,7 +222,7 @@ public abstract class Unit extends ICWarsActor implements Interactable, Interact
      */
     public void updateRange(int radius, DiscreteCoordinates newPosition) {
 
-
+        //Utiliser getCurrentMainCellCoordinates()
         this.fromX = newPosition.x;
         this.fromY = newPosition.y;
 
@@ -253,7 +251,9 @@ public abstract class Unit extends ICWarsActor implements Interactable, Interact
                 updatedRange.addNode(coordinates, hasLeftEdge, hasUpEdge, hasRightEdge, hasDownEdge);
             }
         }
+        System.out.println("UPDATED RANGE : " + updatedRange);
         this.range = updatedRange;
+        System.out.println("RANGE : " + this.range);
     }
 
     /**

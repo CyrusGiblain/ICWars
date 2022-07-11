@@ -129,7 +129,7 @@ public class ICWarsInfoPanel implements Graphics {
                 citySprite.setRelativeTransform(spriteTransform);
                 citySprite.draw(canvas);
                 break;
-            case MOUNTAIN:
+            case MOUNT:
                 mountSprite.setRelativeTransform(spriteTransform);
                 mountSprite.draw(canvas);
                 break;

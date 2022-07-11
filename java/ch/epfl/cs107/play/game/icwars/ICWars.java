@@ -56,12 +56,6 @@ public class ICWars extends AreaGame {
             icWarsCurrentState = ICWarsCurrentState.INIT;
         }
 
-        //System.out.println(icWarsCurrentState);
-
-        /*if (currentPlayer != null) {
-            System.out.println(currentPlayer);
-        }*/
-
         switch (icWarsCurrentState) {
 
             case INIT:
@@ -232,6 +226,7 @@ public class ICWars extends AreaGame {
     public void end(){
 
         super.end();
+
         if (pointsJoueurBleu > pointsJoueurOrange) {
             System.out.println("Le joueur bleu a remporté la partie " + pointsJoueurBleu + "-" + pointsJoueurOrange + ".");
         } else if (pointsJoueurBleu == pointsJoueurOrange) {
@@ -274,6 +269,5 @@ public class ICWars extends AreaGame {
     }
 }
 // Interaction avec les unités à finir.
-// Change position quand une unité est éliminée.
 // Parfois problème de range qui s'affiche en double.
-// Gérer le niveau 1.
+// IA à faire.

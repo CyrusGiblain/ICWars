@@ -20,7 +20,7 @@ public class ICWarsBehavior extends AreaBehavior{
         PLAIN(-14112955, 1),
         WOOD(-65536, 3),
         RIVER(-16776961, 0),
-        MOUNTAIN(-256, 4),
+        MOUNT(-256, 4),
         CITY(-1, 2);
 
         private final int type;
@@ -73,8 +73,8 @@ public class ICWarsBehavior extends AreaBehavior{
                 case RIVER:
                     name = "River";
                     break;
-                case MOUNTAIN:
-                    name = "Mountain";
+                case MOUNT:
+                    name = "Mount";
                     break;
                 case CITY:
                     name = "City";
@@ -109,8 +109,8 @@ public class ICWarsBehavior extends AreaBehavior{
                     cellType = RIVER;
                     break;
 
-                case MOUNTAIN:
-                    cellType = MOUNTAIN;
+                case MOUNT:
+                    cellType = MOUNT;
                     break;
 
                 case CITY:
@@ -173,9 +173,7 @@ public class ICWarsBehavior extends AreaBehavior{
         protected boolean canEnter(Interactable entity) {
             if (entity.takeCellSpace()) {
                 for (Interactable otherEntity : entities) {
-                    //System.out.println("ENTITIES : " + entities);
                     if (otherEntity.takeCellSpace()) {
-                        //System.out.println("ENTITY takes cell space");
                         return false;
                     }
                 }

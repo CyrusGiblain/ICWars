@@ -9,8 +9,6 @@ import ch.epfl.cs107.play.game.icwars.area.ICWarsBehavior;
 import ch.epfl.cs107.play.math.DiscreteCoordinates;
 import ch.epfl.cs107.play.window.Canvas;
 
-import static java.lang.System.out;
-
 public class ICWarsPlayerGUI implements Graphics {
 
     private ICWarsPlayer player;
@@ -39,7 +37,9 @@ public class ICWarsPlayerGUI implements Graphics {
      */
     @Override
     public void draw(Canvas canvas) {
+        //System.out.println("player.getCurrentCells : " + player.getCurrentCells());
         DiscreteCoordinates destination = player.getCurrentCells().get(0);
+        //System.out.println("destination : " + destination);
 
         Unit selectedUnit = player.getSelectedUnit();
         if(selectedUnit != null && !selectedUnit.theUnitHasBeenUsed() &&

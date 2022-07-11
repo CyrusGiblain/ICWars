@@ -74,8 +74,6 @@ public class RealPlayer extends ICWarsPlayer implements Interactable {
         Button A = keyboard1.get(Keyboard.A);
         Button W = keyboard1.get(Keyboard.W);
 
-        //System.out.println(this.currentState);
-
         switch (currentState) {
 
             case IDLE:
@@ -123,10 +121,11 @@ public class RealPlayer extends ICWarsPlayer implements Interactable {
                 canMoveOnlyInTheRange();
 
                 if (enter.isReleased()) {
-                    selectedUnit.changePosition(getCurrentMainCellCoordinates());
-                    selectedUnit.setIsUsed(false);
-
-                    currentState = ICWarsPlayerCurrentState.ACTION_SELECTION;
+                    boolean deplacement = selectedUnit.changePosition(getCurrentMainCellCoordinates());
+                    if (deplacement) {
+                        selectedUnit.setIsUsed(false);
+                        currentState = ICWarsPlayerCurrentState.ACTION_SELECTION;
+                    }
                 }
                 if (tab.isReleased()) {
                     currentState = ICWarsPlayerCurrentState.NORMAL;
@@ -337,6 +336,4 @@ public class RealPlayer extends ICWarsPlayer implements Interactable {
         ((ICWarsInteractionVisitor)v).interactWith(this);
     }
 }
-
-// Pour le bleu, unregister 2 fois, problème ?
 
