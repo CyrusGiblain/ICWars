@@ -190,8 +190,9 @@ public class ImageGraphics extends Node implements Graphics {
     
     @Override
     public void draw(Canvas canvas) {
-        if (name == null)
+        if (name == null) {
             return;
+        }
         Image image = canvas.getImage(name, roi, removeBackground);
         Transform transform = Transform.I.scaled(width, height).translated(anchor.x, anchor.y).transformed(getTransform());
         canvas.drawImage(image, transform, alpha, depth);
