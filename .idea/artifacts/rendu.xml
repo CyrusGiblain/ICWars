@@ -1,0 +1,14 @@
+<component name="ArtifactManager">
+  <artifact name="rendu">
+    <output-path>$PROJECT_DIR$/out/artifacts/rendu</output-path>
+    <root id="root">
+      <element id="archive" name="projet-cs107.zip">
+        <element id="directory" name="MonProjet">
+          <element id="directory" name="src">
+            <element id="dir-copy" path="$PROJECT_DIR$/../untitled/src" />
+          </element>
+        </element>
+      </element>
+    </root>
+  </artifact>
+</component>
