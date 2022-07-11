@@ -113,6 +113,10 @@ public class ICWars extends AreaGame {
                 for (ICWarsPlayer player : listOfPlayers) {
                     if (player.isDefeated()) {
                         listOfPlayersWaitingForTheCurrentRound.remove(player);
+                    } else {
+                        for (Unit unit : player.getUnits()) {
+                            unit.setIsUsed(false);
+                        }
                     }
                 }
 
@@ -120,9 +124,6 @@ public class ICWars extends AreaGame {
                     currentPlayer.leaveArea();
                 } else if (!listOfPlayersWaitingForNextTurn.contains(currentPlayer)) {
                     listOfPlayersWaitingForNextTurn.add(currentPlayer);
-                    for (int i = 0; i < currentPlayer.getUnits().size(); ++i) {
-                        currentPlayer.getUnits().get(i).setIsUsed(false);
-                    }
                 }
                 icWarsCurrentState = ICWarsCurrentState.CHOOSE_PLAYER;
                 this.currentPlayer.selectedUnit = null;
