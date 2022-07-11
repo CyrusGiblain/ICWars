@@ -106,12 +106,15 @@ public abstract class MovableAreaEntity extends AreaEntity {
      * @return true if the move was successful, false otherwise
      */
     public boolean changePosition(DiscreteCoordinates newPosition) {
-        if (newPosition.equals(getCurrentMainCellCoordinates()))
+        if (newPosition.equals(getCurrentMainCellCoordinates())) {
+            System.out.println("A");
             return true;
+        }
 
-        if (!getOwnerArea().canEnterAreaCells(this, List.of(newPosition)))
+        if (!getOwnerArea().canEnterAreaCells(this, List.of(newPosition))) {
+            System.out.println("B");
             return false;
-
+        }
 
         getOwnerArea().leaveAreaCells(this, getCurrentCells());
         setCurrentPosition(newPosition.toVector());

@@ -52,7 +52,7 @@ public interface Interactable {
     void onEntering(List<DiscreteCoordinates> coordinates);
 
 
-    /// Interactable Listener
+    // Interactable Listener
     interface Listener{
         /**
          * Indicate if the given Interactable entity can leave the cell at given coordinates

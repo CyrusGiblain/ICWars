@@ -14,13 +14,14 @@ import ch.epfl.cs107.play.window.Keyboard;
 import java.util.ArrayList;
 import java.util.List;
 
-public class Attack extends Action{
+public class Attack extends Action {
 
-    private String name = "(A)ttack";
+    private final String name = "(A)ttack";
     private Unit attackedUnit;
     private List<Unit> enemyUnitsInRange = new ArrayList<>();
     private int attackedUnitIndex = 0;
     ImageGraphics cursor;
+    private int defenseStars;
 
     /**
      * The Attack constructor
@@ -28,15 +29,14 @@ public class Attack extends Action{
      * @param unit (Unit): The unit used to attack
      * @param area (ICWarsArea): The area where the attack takes place
      */
-    public Attack(Unit unit, ICWarsArea area){
+    public Attack(Unit unit, ICWarsArea area) {
         super(unit, area);
-        cursor = new ImageGraphics(ResourcePath.getSprite("icwars/UIpackSheet"), 1f, 1f, new RegionOfInterest(4*18, 26*18,16,16));
+        cursor = new ImageGraphics(ResourcePath.getSprite("icwars/UIpackSheet"), 1f, 1f, new RegionOfInterest(4 * 18, 26 * 18, 16, 16));
     }
 
     @Override
     public void draw(Canvas canvas) {
-        if(!enemyUnitsInRange.isEmpty()) {
-            System.out.println("Drawing");
+        if (!enemyUnitsInRange.isEmpty()) {
             cursor.setAnchor(canvas.getPosition().add(1, 0));
             cursor.draw(canvas);
         }
@@ -46,6 +46,7 @@ public class Attack extends Action{
     //then create a list of all them
     @Override
     public void doAction(float dt, ICWarsPlayer player, Keyboard keyboard) {
+
         Button enter = keyboard.get(Keyboard.ENTER);
         Button left = keyboard.get(Keyboard.LEFT);
         Button right = keyboard.get(Keyboard.RIGHT);
@@ -57,30 +58,40 @@ public class Attack extends Action{
         if (tab.isReleased()) {
             goBack(player);
         }
-        if(enemyUnitsInRange.size() == 0) {
+        if (enemyUnitsInRange.size() == 0) {
             goBack(player);
             System.out.println("Nothing is in the Range!");
-        }
-        else{
+        } else {
             if (right.isReleased() && attackedUnitIndex < enemyUnitsInRange.size() - 1) {
                 ++attackedUnitIndex;
-            } else if(right.isReleased() && attackedUnitIndex == enemyUnitsInRange.size()-1) {
+            } else if (right.isReleased() && attackedUnitIndex == enemyUnitsInRange.size() - 1) {
                 attackedUnitIndex = 0;
             }
             if (left.isReleased() && attackedUnitIndex > 0) {
                 --attackedUnitIndex;
-            } else if(left.isReleased() && attackedUnitIndex == 0){
-                attackedUnitIndex = enemyUnitsInRange.size()-1;
+            } else if (left.isReleased() && attackedUnitIndex == 0) {
+                attackedUnitIndex = enemyUnitsInRange.size() - 1;
             }
             enemyUnitsInRange.get(attackedUnitIndex).centerCamera();
-            //System.out.println(enemyUnitsInRange.get(attackedUnitIndex));
+
             if (enter.isReleased()) {
-                //attack
+
                 attackedUnit = enemyUnitsInRange.get(attackedUnitIndex);
-                impactOnHP(currentUnit, attackedUnit);
-                if (attackedUnit.isDead(attackedUnit)) {
-                    currentUnit.changePosition(new DiscreteCoordinates((int) player.getPosition().x, (int) player.getPosition().y));
+
+                int nouveauxHP = attackedUnit.getHp() - currentUnit.getDamage() + attackedUnit.getDefenseStars();
+                attackedUnit.setHp(attackedUnit, nouveauxHP);
+
+                if (attackedUnit.getHp() == 0) {
+
+                    enemyUnitsInRange.remove(attackedUnitIndex);
+                    attackedUnit.leaveArea();
+
+                    area.purgeRegistration();
+
+                    DiscreteCoordinates c = new DiscreteCoordinates((int) attackedUnit.getPosition().x, (int) attackedUnit.getPosition().y);
+                    currentUnit.changePosition(c);
                 }
+
                 player.selectedUnit.setIsUsed(true);
                 player.setCurrentState(ICWarsPlayer.ICWarsPlayerCurrentState.NORMAL);
             }
@@ -90,10 +101,10 @@ public class Attack extends Action{
     @Override
     public void doAutoAction(float dt, ICWarsPlayer player, Unit attackedUnit) {
         Unit currentUnit = player.getSelectedUnit();
-        DiscreteCoordinates coords = new DiscreteCoordinates((int)attackedUnit.getPosition().x, (int)attackedUnit.getPosition().y);
+        DiscreteCoordinates coords = new DiscreteCoordinates((int) attackedUnit.getPosition().x, (int) attackedUnit.getPosition().y);
         //normal that attackedUnit isn't initialzied, need to get it from the ArrayList
-        impactOnHP(currentUnit, attackedUnit);
-        if(attackedUnit.isDead(attackedUnit)){
+        //nouveauxHP(currentUnit, attackedUnit);
+        if (attackedUnit.isDead()) {
             currentUnit.changePosition(coords);
         }
         attackedUnit.setIsUsed(true);
@@ -102,40 +113,28 @@ public class Attack extends Action{
         attackedUnit.centerCamera();
     }
 
-    /**
-     * Method giving the consequence on the HP
-     *
-     * @param attackingUnit (Unit): The unit that attacks
-     * @param attackedUnit  (Unit): The unit that is attacked
-     */
-    public void impactOnHP(Unit attackingUnit, Unit attackedUnit){
-        // have to work on the interactor
-        //int defense_stars = attackedUnit.getCurrentCellTypeStars(attackedUnit);
-        int damage = attackedUnit.getHp() - attackingUnit.getDamage() + attackingUnit.getCellStars();
-        attackedUnit.setHp(attackedUnit, damage);
-    }
-
     @Override
-    public String getName(){
+    public String getName() {
         return this.name;
     }
 
     /**
-     *
      * @param player (ICWarsPlayer): The player who is checking for enemy units in his range
      * @return the list of enemy units that are inside his range
      */
-    public List<Unit> getEnemyUnitsInRange(ICWarsPlayer player){
+    public List<Unit> getEnemyUnitsInRange(ICWarsPlayer player) {
         List<Unit> listOfEnemyUnitsInRange = new ArrayList<>();
         Unit selectedUnit = player.getSelectedUnit();
-        for(int i = 0; i < area.units.size(); ++i) {
+        for (int i = 0; i < area.units.size(); ++i) {
             Unit unit = area.units.get(i);
-            DiscreteCoordinates coords = new DiscreteCoordinates((int)unit.getPosition().x, (int)unit.getPosition().y);
-            if(selectedUnit.getRange().nodeExists(coords) &&
-                    selectedUnit.getCamp() != unit.getCamp()){
+            DiscreteCoordinates coords = new DiscreteCoordinates((int) unit.getPosition().x, (int) unit.getPosition().y);
+            if (selectedUnit.getRange().nodeExists(coords) &&
+                    selectedUnit.getCamp() != unit.getCamp()
+            && !unit.isDead()) {
                 listOfEnemyUnitsInRange.add(unit);
             }
         }
+        //System.out.println(listOfEnemyUnitsInRange.size());
         return listOfEnemyUnitsInRange;
     }
 

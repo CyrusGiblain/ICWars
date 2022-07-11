@@ -19,7 +19,6 @@ public class Tanks extends Unit{
 
     private int inflictedDamage = 7;
     private int rayon = 4;
-    private int hp = getHp();
     private final int maxHp = 10;
     private Sprite tankAllie = new Sprite("icwars/friendlyTank", 1.5f, 1.5f,  this, null, new Vector(-0.25f, -0.25f));
     private Sprite tankEnnemi = new Sprite("icwars/enemyTank", 1.5f, 1.5f, this, null, new Vector(-0.25f, -0.25f));
@@ -37,7 +36,6 @@ public class Tanks extends Unit{
      */
     public Tanks(ICWarsArea area,  DiscreteCoordinates position, faction faction) {
         super(area, position, faction, 4);
-        this.setHp(this, maxHp);
         this.camp = faction;
         this.area = area;
         this.listOfActions = List.of(new Attack(this, this.area), new Wait(this, this.area));
@@ -76,7 +74,7 @@ public class Tanks extends Unit{
      * @return the HP of the tank
      */
     public int getHp(){
-        return hp;
+        return super.getHp();
     }
 
     @Override

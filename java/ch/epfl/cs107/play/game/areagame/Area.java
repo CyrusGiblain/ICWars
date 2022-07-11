@@ -7,6 +7,7 @@ import ch.epfl.cs107.play.game.actor.Actor;
 import ch.epfl.cs107.play.game.actor.Draggable;
 import ch.epfl.cs107.play.game.areagame.actor.Interactable;
 import ch.epfl.cs107.play.game.areagame.actor.Interactor;
+import ch.epfl.cs107.play.game.icwars.actor.players.RealPlayer;
 import ch.epfl.cs107.play.io.FileSystem;
 import ch.epfl.cs107.play.math.DiscreteCoordinates;
 import ch.epfl.cs107.play.math.Transform;
@@ -81,10 +82,14 @@ public abstract class Area implements Playable, PauseMenu.Pausable {
 
         boolean errorHappen = false;
 
-        if(a instanceof Interactor)
+        if(a instanceof Interactor) {
             errorHappen = !interactors.add((Interactor) a);
-        if(a instanceof Interactable)
+        }
+
+        if(a instanceof Interactable) {
             errorHappen = errorHappen || !enterAreaCells(((Interactable) a), ((Interactable) a).getCurrentCells());
+
+        }
         errorHappen = errorHappen || !actors.add(a);
 
         if(errorHappen && !safeMode) {
@@ -102,15 +107,18 @@ public abstract class Area implements Playable, PauseMenu.Pausable {
      * @param safeMode (Boolean): if True, the method ends
      */
     private void removeActor(Actor a, boolean safeMode){
+
         boolean errorHappen = false;
 
         if(a instanceof Interactor)
             errorHappen = !interactors.remove((Interactor)a);
-        if(a instanceof Interactable)
+        if(a instanceof Interactable) {
             errorHappen = errorHappen || !leaveAreaCells(((Interactable) a), ((Interactable) a).getCurrentCells());
+        }
         errorHappen = errorHappen || !actors.remove(a);
 
         if(errorHappen && !safeMode) {
+
             System.out.println("Actor " + a + " cannot be completely removed, so add it from where it was");
             // Call it in safe mode to avoid recursive calls
             addActor(a, true);
@@ -264,7 +272,8 @@ public abstract class Area implements Playable, PauseMenu.Pausable {
     }
 
     @Override
-    public void update(float deltaTime) {    	
+    public void update(float deltaTime) {
+
     	purgeRegistration();
 
         // Decide if we update the contextual menu or this content
@@ -276,7 +285,7 @@ public abstract class Area implements Playable, PauseMenu.Pausable {
             for (Actor actor : actors) {
                 actor.update(deltaTime);
             }
-            
+
             Draggable currentDraggedElement = DragHelper.getCurrentDraggedElement();
             if(currentDraggedElement != null && currentDraggedElement.wantsDropInteraction()) {
             	areaBehavior.dropInteractionOf(currentDraggedElement, getRelativeMouseCoordinates());
@@ -295,6 +304,7 @@ public abstract class Area implements Playable, PauseMenu.Pausable {
             // Update camera location
             updateCamera();
 
+
             // Draw actors
             for (Actor actor : actors) {
                 actor.bip(window);
@@ -303,7 +313,7 @@ public abstract class Area implements Playable, PauseMenu.Pausable {
         }
     }
 
-    final void purgeRegistration() {
+    public final void purgeRegistration() {
         // PART 1
         // - Register actors
         for (Actor actor : registeredActors) {
@@ -356,7 +366,6 @@ public abstract class Area implements Playable, PauseMenu.Pausable {
 
     @Override
     public void end() {
-        // TODO save the AreaState somewhere
     }
 
 

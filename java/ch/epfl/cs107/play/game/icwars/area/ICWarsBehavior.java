@@ -150,7 +150,6 @@ public class ICWarsBehavior extends AreaBehavior{
 
     public class ICWarsCell extends Cell implements Interactable {
 
-
         private final ICWarsBehavior.ICWarsCellType type;
 
         /**
@@ -174,7 +173,9 @@ public class ICWarsBehavior extends AreaBehavior{
         protected boolean canEnter(Interactable entity) {
             if (entity.takeCellSpace()) {
                 for (Interactable otherEntity : entities) {
+                    //System.out.println("ENTITIES : " + entities);
                     if (otherEntity.takeCellSpace()) {
+                        //System.out.println("ENTITY takes cell space");
                         return false;
                     }
                 }
@@ -202,13 +203,9 @@ public class ICWarsBehavior extends AreaBehavior{
             ((ICWarsInteractionVisitor) v).interactWith(this);
         }
 
-        public class ICWarsCellInteractionHandler implements ICWarsInteractionVisitor{
-           @Override
-            public void interactWith(ICWarsCellType cellType){
-           }
-        }
         // Method to get the type of the cell
-        public ICWarsCellType getType(){return type;}
+        public ICWarsCellType getType(){
+            return type;
+        }
     }
-
 }

@@ -1,6 +1,7 @@
 package ch.epfl.cs107.play.game.icwars;
 
 import ch.epfl.cs107.play.game.areagame.AreaGame;
+import ch.epfl.cs107.play.game.icwars.actor.ICWarsActor;
 import ch.epfl.cs107.play.game.icwars.actor.players.unit.Soldats;
 import ch.epfl.cs107.play.game.icwars.actor.players.unit.Tanks;
 import ch.epfl.cs107.play.game.icwars.actor.players.unit.Unit;
@@ -33,43 +34,45 @@ public class ICWars extends AreaGame {
     private List<ICWarsPlayer> listOfPlayersWaitingForTheCurrentRound;
     private List<ICWarsPlayer> listOfPlayersWaitingForNextTurn = new ArrayList<>();
     private ICWarsPlayer currentPlayer;
+    private int pointsJoueurBleu = 0;
+    private int pointsJoueurOrange = 0;
 
     private final String[] areas = {"icwars/Level0", "icwars/Level1"};
-    private int areaIndex;
+    private int areaIndex = 0;
 
     @Override
     public void update(float deltaTime) {
         super.update(deltaTime);
 
-        Keyboard keyboard= getWindow().getKeyboard();
+        Keyboard keyboard = getWindow().getKeyboard();
 
-        Button keyN = keyboard.get(Keyboard.N);
         Button keyR =  keyboard.get(Keyboard.R);
-        Button tab = keyboard.get(Keyboard.TAB);
-        Button G = keyboard.get(Keyboard.G);
-
-        //if (areaIndex == 0) {
-        //if (keyN.isReleased()) {
-        //     switchArea();
-        //}
 
         if (keyR.isReleased()) {
             listOfPlayers.clear();
-            initArea(areas[0]);
             listOfPlayersWaitingForTheCurrentRound.clear();
             listOfPlayersWaitingForNextTurn.clear();
+            begin(getWindow(), getFileSystem());
             icWarsCurrentState = ICWarsCurrentState.INIT;
         }
 
+        //System.out.println(icWarsCurrentState);
+
+        /*if (currentPlayer != null) {
+            System.out.println(currentPlayer);
+        }*/
 
         switch (icWarsCurrentState) {
 
             case INIT:
+
                 listOfPlayersWaitingForTheCurrentRound = new ArrayList<>();
                 if (!listOfPlayers.isEmpty()) {
                     listOfPlayersWaitingForTheCurrentRound = new ArrayList<>(listOfPlayers);
                 }
+
                 icWarsCurrentState = ICWarsCurrentState.CHOOSE_PLAYER;
+
                 break;
 
             case CHOOSE_PLAYER:
@@ -78,65 +81,86 @@ public class ICWars extends AreaGame {
                     icWarsCurrentState = ICWarsCurrentState.END_TURN;
 
                 } else {
-                    currentPlayer = listOfPlayersWaitingForTheCurrentRound.get(0);
-                    listOfPlayersWaitingForTheCurrentRound.remove(0);
-                    icWarsCurrentState = ICWarsCurrentState.START_PLAYER_TURN;
+
+                    if (!listOfPlayersWaitingForTheCurrentRound.get(0).isDefeated()) {
+                        currentPlayer = listOfPlayersWaitingForTheCurrentRound.get(0);
+                        listOfPlayersWaitingForTheCurrentRound.remove(0);
+                        icWarsCurrentState = ICWarsCurrentState.START_PLAYER_TURN;
+                    }
                 }
 
                 break;
 
             case START_PLAYER_TURN:
+
                 if (currentPlayer != null) {
                     currentPlayer.startTurn();
                     icWarsCurrentState = ICWarsCurrentState.PLAYER_TURN;
                 }
+
                 break;
 
             case PLAYER_TURN:
+
                 if (currentPlayer.getCurrentState() == ICWarsPlayer.ICWarsPlayerCurrentState.IDLE) {
                     icWarsCurrentState = ICWarsCurrentState.END_PLAYER_TURN;
                 }
+
                 break;
 
             case END_PLAYER_TURN:
+
+                for (ICWarsPlayer player : listOfPlayers) {
+                    if (player.isDefeated()) {
+                        listOfPlayersWaitingForTheCurrentRound.remove(player);
+                    }
+                }
+
                 if (currentPlayer.isDefeated()) {
-                    area.unregisterActor(currentPlayer);
-                } else if(tab.isReleased()){
+                    currentPlayer.leaveArea();
+                } else if (!listOfPlayersWaitingForNextTurn.contains(currentPlayer)) {
                     listOfPlayersWaitingForNextTurn.add(currentPlayer);
                     for (int i = 0; i < currentPlayer.getUnits().size(); ++i) {
                         currentPlayer.getUnits().get(i).setIsUsed(false);
                     }
-                    icWarsCurrentState = ICWarsCurrentState.CHOOSE_PLAYER;
                 }
+                icWarsCurrentState = ICWarsCurrentState.CHOOSE_PLAYER;
+                this.currentPlayer.selectedUnit = null;
+
                 break;
 
             case END_TURN:
-                for (int i = 0; i < listOfPlayersWaitingForNextTurn.size(); ++i) {
-                    if (listOfPlayersWaitingForNextTurn.get(i).isDefeated()) {
-                        listOfPlayersWaitingForNextTurn.remove(i);
+
+                for (ICWarsPlayer player : listOfPlayers) {
+                    if (player.isDefeated()) {
+                        listOfPlayersWaitingForNextTurn.remove(player);
                     }
                 }
-                for (int i = 0; i < listOfPlayers.size(); ++i) {
-                    if (listOfPlayers.get(i).isDefeated()) {
-                        listOfPlayers.remove(i);
-                    }
-                }
+
                 if (listOfPlayersWaitingForNextTurn.size() == 1) {
+                    ICWarsActor.faction faction = ((RealPlayer) listOfPlayersWaitingForNextTurn.get(0)).getCamp();
+                    if (faction == ALLIE) {
+                        System.out.println("Le joueur bleu a vaincu le joueur orange lors du niveau " + (areaIndex + 1) + ".");
+                        pointsJoueurBleu++;
+                    } else {
+                        System.out.println("Le joueur orange a vaincu le joueur bleu lors du niveau " + (areaIndex + 1) + ".");
+                        pointsJoueurOrange++;
+                    }
                     icWarsCurrentState = ICWarsCurrentState.END;
                 } else {
                     listOfPlayersWaitingForTheCurrentRound.clear();
                     listOfPlayersWaitingForTheCurrentRound.addAll(listOfPlayersWaitingForNextTurn);
                     icWarsCurrentState = ICWarsCurrentState.CHOOSE_PLAYER;
                 }
+
                 break;
 
             case END:
+
                 switchArea();
+                break;
         }
     }
-
-    // Previous method used to manually select a unit
-    //if (keyboard.get(Keyboard.U).isReleased()) { ((RealPlayer)player).selectUnit(0);} // 0, 1 ...
 
     @Override
     public String getTitle() {
@@ -155,8 +179,8 @@ public class ICWars extends AreaGame {
     public boolean begin(Window window, FileSystem fileSystem) {
         if (super.begin(window, fileSystem)) {
             createAreas();
-            areaIndex = 0;
             initArea(areas[areaIndex]);
+            icWarsCurrentState = ICWarsCurrentState.INIT;
             return true;
         }
         return false;
@@ -174,14 +198,6 @@ public class ICWars extends AreaGame {
         DiscreteCoordinates coordsALLY = area.getPlayerSpawnPosition();
         DiscreteCoordinates coordsEnnemy1 = area.getEnemySpawnPosition();
 
-        //Previous data
-        //DiscreteCoordinates coordsSoldat = new DiscreteCoordinates(5,6);
-        //DiscreteCoordinates coordsTank = new DiscreteCoordinates(3, 2);
-        //player = new RealPlayer(area, coords, ALLIE, new Soldats(area, coordsSoldat, ALLIE), new Tanks(area, coordsTank, ALLIE));
-        //player.enterArea(area, coords);
-        //player.centerCamera();
-        //player.startTurn();
-
         DiscreteCoordinates coordsOfTheTankOfTheFirstRealPlayer = new DiscreteCoordinates(2, 5);
         DiscreteCoordinates coordsOfTheSoldatOfTheFirstRealPlayer = new DiscreteCoordinates(3, 5);
 
@@ -196,6 +212,7 @@ public class ICWars extends AreaGame {
         Tanks tankSecondPlayer = new Tanks(area, coordsOfTheTankOfTheSecondRealPlayer, ENNEMIE);
         Soldats soldatSecondPlayer = new Soldats(area, coordsOfTheSoldatOfTheSecondRealPlayer, ENNEMIE);
         secondPlayerOfTheList = new RealPlayer(area, coordsEnnemy1, ENNEMIE, tankSecondPlayer, soldatSecondPlayer);
+
         area.units.add(tankFirstPlayer);
         area.units.add(soldatFirstPlayer);
         area.units.add(tankSecondPlayer);
@@ -208,33 +225,34 @@ public class ICWars extends AreaGame {
         firstPlayerOfTheList.enterArea(area, coordsALLY);
 
         secondPlayerOfTheList.enterArea(area, coordsEnnemy1);
-
-        //Previous units
-        //Tanks tank = new Tanks(area, new DiscreteCoordinates(3, 4), ALLIE);
-        //Soldats soldat = new Soldats(area, new DiscreteCoordinates(5, 6), ALLIE);
-        //units.add(tank);
-        //units.add(soldat);
     }
 
     // Method to end the game
     public void end(){
+
         super.end();
+        if (pointsJoueurBleu > pointsJoueurOrange) {
+            System.out.println("Le joueur bleu a remporté la partie " + pointsJoueurBleu + "-" + pointsJoueurOrange + ".");
+        } else if (pointsJoueurBleu == pointsJoueurOrange) {
+            System.out.println("La partie se termine sur un match nul " + pointsJoueurBleu + "-" + pointsJoueurOrange + ".");
+        } else {
+            System.out.println("Le joueur orange a remporté la partie " + pointsJoueurOrange + "-" + pointsJoueurBleu + ".");
+        }
+        System.exit(0);
     }
 
     //Method to switch from the first area to the second
     protected void switchArea() {
-        //player.leaveArea();
-        for (ICWarsPlayer player : listOfPlayersWaitingForNextTurn) {
-            player.leaveArea();
-        }
-        areaIndex = (areaIndex==0) ? 1 : 0;
-        ICWarsArea currentArea = (ICWarsArea) setCurrentArea(areas[areaIndex], false);
 
-        //It's the previous player we used
-        //player.enterArea(currentArea, currentArea.getPlayerSpawnPosition());
+        listOfPlayers.clear();
+        listOfPlayersWaitingForTheCurrentRound.clear();
+        listOfPlayersWaitingForNextTurn.clear();
 
-        for (ICWarsPlayer player : listOfPlayers) {
-            player.enterArea(area, currentArea.getPlayerSpawnPosition());
+        if (areaIndex == 0) {
+            areaIndex = 1;
+            begin(getWindow(), getFileSystem());
+        } else {
+            end();
         }
     }
 
@@ -254,3 +272,7 @@ public class ICWars extends AreaGame {
         END;
     }
 }
+// Interaction avec les unités à finir.
+// Change position quand une unité est éliminée.
+// Parfois problème de range qui s'affiche en double.
+// Gérer le niveau 1.

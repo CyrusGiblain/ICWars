@@ -42,13 +42,14 @@ public class ICWarsPlayerGUI implements Graphics {
         DiscreteCoordinates destination = player.getCurrentCells().get(0);
 
         Unit selectedUnit = player.getSelectedUnit();
-        if(selectedUnit != null && !selectedUnit.theUnitHasBeenUsed())
+        if(selectedUnit != null && !selectedUnit.theUnitHasBeenUsed() &&
+        player.getCurrentState() == ICWarsPlayer.ICWarsPlayerCurrentState.MOVE_UNIT)
             selectedUnit.drawRangeAndPathTo(destination, canvas);
 
+        infoPanel.setCurrentCell(((RealPlayer)player).getCellType());
+
         if (player.getCurrentState() == ICWarsPlayer.ICWarsPlayerCurrentState.NORMAL ||
-                player.getCurrentState() == ICWarsPlayer.ICWarsPlayerCurrentState.SELECT_CELL||
-                player.getCurrentState() == ICWarsPlayer.ICWarsPlayerCurrentState.MOVE_UNIT) {
-            infoPanel.setCurrentCell(((RealPlayer)player).getCellType());
+                player.getCurrentState() == ICWarsPlayer.ICWarsPlayerCurrentState.SELECT_CELL) {
             infoPanel.draw(canvas);
         }
 
@@ -63,13 +64,20 @@ public class ICWarsPlayerGUI implements Graphics {
      *
      * @param cellUnit
      */
-    public void setCellUnit(Unit cellUnit){infoPanel.setUnit(cellUnit);
-        this.cellUnit = cellUnit;}
+    public void setCellUnit(Unit cellUnit){
+        infoPanel.setUnit(cellUnit);
+        //if (player.changePosition()) {
+
+        //}
+        //this.cellUnit = cellUnit;
+    }
 
     /**
      * Method to set a unit
      *
      * @param unit  (Unit): The unit we want to set
      */
-    public void setUnit(Unit unit){this.unit = unit;}
+    public void setUnit(Unit unit) {
+        this.unit = unit;
+    }
 }

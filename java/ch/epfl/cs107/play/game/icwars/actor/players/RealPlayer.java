@@ -22,7 +22,7 @@ import ch.epfl.cs107.play.window.Keyboard;
 import java.util.Collections;
 import java.util.List;
 
-public class RealPlayer extends ICWarsPlayer {
+public class RealPlayer extends ICWarsPlayer implements Interactable {
     private float hp;
     private Sprite sprite;
     private String spriteName;
@@ -33,7 +33,6 @@ public class RealPlayer extends ICWarsPlayer {
     private ICWarsArea area;
     private Action action;
     private ICWarsCellType cellType;
-
 
     /**
      * Constructor of RealPlayer
@@ -75,12 +74,16 @@ public class RealPlayer extends ICWarsPlayer {
         Button A = keyboard1.get(Keyboard.A);
         Button W = keyboard1.get(Keyboard.W);
 
+        //System.out.println(this.currentState);
+
         switch (currentState) {
 
             case IDLE:
+
                 break;
 
             case NORMAL:
+
                 canMove();
 
                 centerCamera();
@@ -93,9 +96,12 @@ public class RealPlayer extends ICWarsPlayer {
 
                     }
                 }
-                // if(tab.isReleased()) {
-                //  currentState = ICWarsPlayerCurrentState.IDLE;
-                //}
+
+                if(tab.isReleased()) {
+                currentState = ICWarsPlayerCurrentState.IDLE;
+                }
+
+
                 break;
 
             case SELECT_CELL:
@@ -118,32 +124,32 @@ public class RealPlayer extends ICWarsPlayer {
 
                 if (enter.isReleased()) {
                     selectedUnit.changePosition(getCurrentMainCellCoordinates());
-                    //currentState = ICWarsPlayerCurrentState.NORMAL;
-                    if (selectedUnit.theUnitHasBeenUsed()) {
-                        currentState = ICWarsPlayerCurrentState.ACTION_SELECTION;
-                    }
+                    selectedUnit.setIsUsed(false);
+
+                    currentState = ICWarsPlayerCurrentState.ACTION_SELECTION;
                 }
                 if (tab.isReleased()) {
-                    currentState = ICWarsPlayerCurrentState.IDLE;
+                    currentState = ICWarsPlayerCurrentState.NORMAL;
                 }
                 break;
 
             case ACTION_SELECTION:
+
                 for (int i = 0; i < selectedUnit.getPossibleActions().size(); ++i) {
                     action= selectedUnit.getPossibleActions().get(i);
                     if (A.isReleased()) {
-                        System.out.println(" A SELECTIONNEE");
                         action = new Attack(this.getSelectedUnit(), this.area);
                         currentState = ICWarsPlayerCurrentState.ACTION;
                     } else if (W.isReleased()) {
-                        System.out.println(("W SELECTIONNEE"));
                         action = new Wait(this.getSelectedUnit(), this.area);
-                        currentState = ICWarsPlayerCurrentState.NORMAL;
+                        currentState = ICWarsPlayerCurrentState.ACTION;
                     }
                 }
+
                 break;
 
             case ACTION:
+
                 float dt = 0;
                 action.doAction(dt, this, keyboard1);
                 break;
@@ -156,7 +162,7 @@ public class RealPlayer extends ICWarsPlayer {
      * @param b (Button): button corresponding to the given orientation, not null
      */
     private void moveIfPressed(Orientation orientation, Button b){
-        if(b.isDown()) {
+        if (b.isDown()) {
             if (!isDisplacementOccurs()) {
                 orientate(orientation);
                 move(MOVE_DURATION);
@@ -186,6 +192,7 @@ public class RealPlayer extends ICWarsPlayer {
 
     @Override
     public void draw(Canvas canvas) {
+
         sprite.draw(canvas);
         icWarsPlayerGUI.draw(canvas);
 
@@ -236,12 +243,10 @@ public class RealPlayer extends ICWarsPlayer {
     @Override
     public void interactWith(Interactable other) {
         ICWarsPlayerInteractionHandler handler = new ICWarsPlayerInteractionHandler();
-        other.acceptInteraction(handler);
+        if (!isDisplacementOccurs()) {
+            other.acceptInteraction(handler);
+        }
     }
-    @Override
-    public void acceptInteraction(AreaInteractionVisitor v) {
-        ((ICWarsInteractionVisitor)v).interactWith(this); }
-
 
     // Method that means that the RealPlayer can move where he wants inside the area
 
@@ -291,14 +296,16 @@ public class RealPlayer extends ICWarsPlayer {
                 icWarsPlayerGUI.setUnit(unit);
                 currentState = ICWarsPlayerCurrentState.MOVE_UNIT;
             }
+
         }
 
         @Override
         public void interactWith(ICWarsBehavior.ICWarsCell cell){
             cellType = cell.getType();
+
         }
 
-        //public void interactWith(ICWarsBehavior.ICWarsCellType cellType){}
+
 
     }
     // Method we used previously to manually select a unit
@@ -320,4 +327,16 @@ public class RealPlayer extends ICWarsPlayer {
         return cellType;
     }
 
+    @Override
+    public boolean takeCellSpace() {
+        return false;
+    }
+
+    @Override
+    public void acceptInteraction(AreaInteractionVisitor v) {
+        ((ICWarsInteractionVisitor)v).interactWith(this);
+    }
 }
+
+// Pour le bleu, unregister 2 fois, problème ?
+

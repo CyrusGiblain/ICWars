@@ -4,7 +4,7 @@ import ch.epfl.cs107.play.game.areagame.Area;
 import ch.epfl.cs107.play.game.areagame.actor.*;
 import ch.epfl.cs107.play.game.areagame.handler.AreaInteractionVisitor;
 import ch.epfl.cs107.play.game.icwars.actor.ICWarsActor;
-import ch.epfl.cs107.play.game.icwars.actor.players.RealPlayer;
+import ch.epfl.cs107.play.game.icwars.actor.players.ICWarsPlayer;
 import ch.epfl.cs107.play.game.icwars.actor.players.action.Action;
 import ch.epfl.cs107.play.game.icwars.area.ICWarsBehavior;
 import ch.epfl.cs107.play.game.icwars.area.ICWarsRange;
@@ -19,7 +19,7 @@ import java.util.Queue;
 public abstract class Unit extends ICWarsActor implements Interactable, Interactor {
 
     private String name;
-    private int hp;         //hp cannot be <0 or unit isDead()
+    private int hp;
     private int maxHp;
     protected Sprite unit;
     private ICWarsRange range;
@@ -27,20 +27,21 @@ public abstract class Unit extends ICWarsActor implements Interactable, Interact
     private int fromY;
     private int radius;
     private boolean unitIsUsed;
-    private ICWarsBehavior.ICWarsCellType cellType = null;
+    private ICWarsBehavior.ICWarsCellType cellType;
     private ICWarsRange updatedRange = new ICWarsRange();
     private int cellStars;
-    private ICWarsUnitInteractionHandler handler;
+    private int defenseStars;
+    private UnitInteractionHandler handler;
 
     /**
      * Unit constructor
      *
-     * @param area        (Area): The area on which is displayed the unit
-     * @param position    (Coordinate): Initial position of the unit
-     * @param faction     (faction): The faction of the unit
-     * @param radius      (int): The radius of the unit
+     * @param area     (Area): The area on which is displayed the unit
+     * @param position (Coordinate): Initial position of the unit
+     * @param faction  (faction): The faction of the unit
+     * @param radius   (int): The radius of the unit
      */
-    public Unit( Area area, DiscreteCoordinates position, ICWarsActor.faction faction, int radius) {
+    public Unit(Area area, DiscreteCoordinates position, ICWarsActor.faction faction, int radius) {
         super(area, position, faction);
 
         this.fromX = position.x;
@@ -48,7 +49,16 @@ public abstract class Unit extends ICWarsActor implements Interactable, Interact
         this.radius = radius;
         this.range = new ICWarsRange();
 
-        handler = new ICWarsUnitInteractionHandler();
+        if (this instanceof Tanks) {
+            this.hp = 10;
+            this.maxHp = 10;
+        }
+        if (this instanceof Soldats) {
+            this.hp = 5;
+            this.maxHp = 5;
+        }
+
+        //handler = new ICWarsUnitInteractionHandler();
 
         for (int x = Math.max(0, fromX - radius); x <= Math.min(getOwnerArea().getWidth() - 1, fromX + radius); ++x) {
             for (int y = Math.max(0, fromY - radius); y <= Math.min(getOwnerArea().getHeight() - 1, fromY + radius); ++y) {
@@ -62,10 +72,10 @@ public abstract class Unit extends ICWarsActor implements Interactable, Interact
                 if (x > fromX - radius && x > 0) {
                     hasLeftEdge = true;
                 }
-                if (y  < fromY + radius && y < getOwnerArea().getHeight()) {
+                if (y < fromY + radius && y < getOwnerArea().getHeight()) {
                     hasUpEdge = true;
                 }
-                if (x < fromX + radius && x < getOwnerArea().getWidth()){
+                if (x < fromX + radius && x < getOwnerArea().getWidth()) {
                     hasRightEdge = true;
                 }
                 if (y > fromY - radius && y > 0) {
@@ -80,7 +90,9 @@ public abstract class Unit extends ICWarsActor implements Interactable, Interact
     /**
      * @return the name of the unit
      */
-    public String getName(){return name;}
+    public String getName() {
+        return name;
+    }
 
     /**
      * Method to change the Hp of the unit
@@ -88,49 +100,35 @@ public abstract class Unit extends ICWarsActor implements Interactable, Interact
      * @param unit (Unit): The unit we want the Hp to be changed
      * @param hp   (int): The new Hp
      */
-    public void setHp(Unit unit, int hp){
-        if(hp > maxHp) hp = unit.maxHp;
-        if(hp < 0) {
-            hp = 0;
-            this.isDead(this);
+    public void setHp(Unit unit, int hp) {
+
+        if (hp > unit.maxHp) {
+            unit.hp = unit.maxHp;
+        } else {
+            unit.hp = Math.max(hp, 0);
         }
-        unit.hp = hp;
     }
 
     // Method to get the Hp of a unit
     public int getHp(){
-        int hpCopie;
-        if (hp > maxHp) hp = maxHp;
-        if(hp < 0){
-            hp = 0;
-            this.isDead(this);
-        }
-        hpCopie = hp;
-        return hpCopie;
+        return this.hp;
     }
 
     /**
-     * @param unit (Unit): The unit involved
      * @return true if the unit is dead
      */
-    public boolean isDead(Unit unit){return this.getHp() < 0;}
+    public boolean isDead(){return this.getHp() == 0;}
 
     public int receiveDamage(int hp, int damage){return hp - damage;}
 
     public int healDamage(int hp, int healing){
-        if(hp + healing > maxHp) return maxHp;
-        return hp + healing;
+        return Math.min(hp + healing, maxHp);
     }
 
     /**
      * @return the damage number
      */
     public abstract int getDamage();
-
-    public int damageTaken(Unit other) {
-        ICWarsUnitInteractionHandler handler = new ICWarsUnitInteractionHandler();
-        return hp - other.getDamage() + cellStars;
-    }
 
     /**
      * @return the number of stars of the cell
@@ -147,7 +145,9 @@ public abstract class Unit extends ICWarsActor implements Interactable, Interact
     }
 
     @Override
-    public boolean takeCellSpace(){return true;}
+    public boolean takeCellSpace() {
+        return true;
+    }
 
     /**
      * @return true if the unit has been used
@@ -167,7 +167,7 @@ public abstract class Unit extends ICWarsActor implements Interactable, Interact
             updateRange(radius, newPosition);
         }
         if (changePosition) {
-            unitIsUsed = true;
+            unitIsUsed = false;
             if (this instanceof Tanks) {
                 if (this.camp == faction.ALLIE) {
                     unit = ((Tanks) this).getTankAllie();
@@ -206,7 +206,8 @@ public abstract class Unit extends ICWarsActor implements Interactable, Interact
      */
     public void drawRangeAndPathTo(DiscreteCoordinates destination, Canvas canvas) {
 
-        range.draw(canvas); Queue<Orientation> path =
+        range.draw(canvas);
+        Queue<Orientation> path =
                 range.shortestPath(getCurrentMainCellCoordinates(), destination);
         //Draw path only if it exists (destination inside the range)
         if (path != null){
@@ -333,21 +334,41 @@ public abstract class Unit extends ICWarsActor implements Interactable, Interact
         return updatedRange;
     }
 
-
     @Override
-    public void interactWith(Interactable other){
+    public void interactWith(Interactable other) {
+        UnitInteractionHandler handler = new UnitInteractionHandler();
         other.acceptInteraction(handler);
     }
+
+    public int getDefenseStars() {
+        return this.defenseStars;
+    }
+
     @Override
     public void acceptInteraction(AreaInteractionVisitor v) {
         ((ICWarsInteractionVisitor)v).interactWith(this);
     }
 
-    private class ICWarsUnitInteractionHandler implements ICWarsInteractionVisitor {
+    private class UnitInteractionHandler implements ICWarsInteractionVisitor {
+        /**
+         * Do this Interactor interact with the given Interactable
+         * The interaction is implemented on the interactor side !
+         *
+         * @param cell
+         */
+        @Override
+        public void interactWith(ICWarsBehavior.ICWarsCell cell) {
+            defenseStars = cell.getType().getDefenseStar();
+        }
 
         @Override
-        public void interactWith(ICWarsBehavior.ICWarsCellType cellType){
-            setCellStars(cellType.getDefenseStar());
+        public void interactWith(ICWarsPlayer player) {
+
         }
     }
 }
+
+// Déplacer l'unit vers l'unit éliminée.
+// Gérer le "fantôme" de l'unit éliminée.
+// Gérer la fin de partie / Changement de niveau.
+

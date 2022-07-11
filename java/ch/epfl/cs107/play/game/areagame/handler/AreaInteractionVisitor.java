@@ -13,6 +13,6 @@ public interface AreaInteractionVisitor {
      * @param other (Interactable): interactable to interact with, not null
      */
     default void interactWith(Interactable other){
-        System.out.println("Specific Interaction is not yet implemented or you simply forget a cast");
+        //System.out.println("Specific Interaction is not yet implemented or you simply forget a cast");
     }
 }

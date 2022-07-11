@@ -1,9 +1,13 @@
 package ch.epfl.cs107.play.game.icwars.actor.players.action;
 
 import ch.epfl.cs107.play.game.actor.Graphics;
+import ch.epfl.cs107.play.game.areagame.actor.Interactable;
+import ch.epfl.cs107.play.game.areagame.actor.Interactor;
+import ch.epfl.cs107.play.game.areagame.handler.AreaInteractionVisitor;
 import ch.epfl.cs107.play.game.icwars.actor.players.ICWarsPlayer;
 import ch.epfl.cs107.play.game.icwars.actor.players.unit.Unit;
 import ch.epfl.cs107.play.game.icwars.area.ICWarsArea;
+import ch.epfl.cs107.play.game.icwars.area.ICWarsBehavior;
 import ch.epfl.cs107.play.window.Canvas;
 import ch.epfl.cs107.play.window.Keyboard;
 
@@ -58,4 +62,5 @@ public abstract class Action implements Graphics {
      * @return the action key
      */
     public int getActionKey(){return actionKey;}
+
 }

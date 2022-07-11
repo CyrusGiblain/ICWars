@@ -27,7 +27,6 @@ public class Soldats extends Unit {
 
     private int inflictedDamage = 2;
     private int rayon = 2;
-    private int hp = getHp();
     private int maxHp = 5;
     private Sprite soldatAllie = new Sprite("icwars/friendlySoldier", 1.5f, 1.5f, this, null, new Vector(-0.25f, -0.25f));
     private Sprite soldatEnnemi = new Sprite("icwars/enemySoldier", 1.5f, 1.5f, this, null, new Vector(-0.25f, -0.25f));
@@ -45,7 +44,6 @@ public class Soldats extends Unit {
 
     public Soldats(ICWarsArea area, DiscreteCoordinates position, faction faction) {
         super(area, position, faction, 2);
-        this.setHp(this, maxHp);
         this.camp = faction;
         this.area = area;
         this.listOfActions = List.of(new Attack(this, this.area), new Wait(this, this.area));
@@ -53,7 +51,7 @@ public class Soldats extends Unit {
 
     @Override
     public int getHp(){
-        return hp;
+        return super.getHp();
     }
 
     @Override

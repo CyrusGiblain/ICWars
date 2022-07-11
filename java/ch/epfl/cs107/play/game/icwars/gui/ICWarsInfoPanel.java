@@ -5,6 +5,8 @@ import ch.epfl.cs107.play.game.actor.ImageGraphics;
 import ch.epfl.cs107.play.game.actor.ShapeGraphics;
 import ch.epfl.cs107.play.game.actor.TextGraphics;
 import ch.epfl.cs107.play.game.areagame.io.ResourcePath;
+import ch.epfl.cs107.play.game.icwars.actor.players.unit.Soldats;
+import ch.epfl.cs107.play.game.icwars.actor.players.unit.Tanks;
 import ch.epfl.cs107.play.game.icwars.actor.players.unit.Unit;
 import ch.epfl.cs107.play.game.icwars.area.ICWarsBehavior;
 import ch.epfl.cs107.play.math.*;
@@ -89,8 +91,15 @@ public class ICWarsInfoPanel implements Graphics {
 
 		if (cellType != null)
 		    drawCellDetails(canvas, height, width);
-		if (unit != null)
-		    drawUnitDetails(canvas, height, width);
+
+		if (this.unit != null) {
+            if (!this.unit.takeCellSpace()) {
+                this.setUnit(null);
+            } else {
+                drawUnitDetails(canvas, height, width);
+            }
+
+        }
     }
 
     private void drawCellDetails(Canvas canvas, float height, float width) {
@@ -102,7 +111,7 @@ public class ICWarsInfoPanel implements Graphics {
         final Transform textTransform = Transform.I.translated(canvas.getPosition().add(3*width/8+.1f, -height/4));
 
         cellTypeText.setRelativeTransform(textTransform);
-       cellTypeText.setText(cellType.typeToString());
+        cellTypeText.setText(cellType.typeToString());
         cellTypeText.draw(canvas);
 
         cellDefenseText.setText("Def: " + cellType.getDefenseStar());
@@ -141,13 +150,19 @@ public class ICWarsInfoPanel implements Graphics {
 
     private void drawUnitDetails(Canvas canvas, float height, float width) {
         final Transform transform = Transform.I.translated(canvas.getPosition().add(width/4, -height/2));
-       unitDetailsBackground.setRelativeTransform(transform);
+        unitDetailsBackground.setRelativeTransform(transform);
         unitDetailsBackground.draw(canvas);
 
         final Transform nameTransform = Transform.I.translated(canvas.getPosition().add(width/4+.1f, -height/4));
 
-      unitNameText.setRelativeTransform(nameTransform);
-       unitNameText.setText(unit.getName());
+        unitNameText.setRelativeTransform(nameTransform);
+        String unitText;
+        if (unit instanceof Tanks) {
+            unitText = "Tank";
+        } else {
+            unitText = "Soldat";
+        }
+        unitNameText.setText(unitText);
         unitNameText.draw(canvas);
 
         final Transform characteristicsTransform = Transform.I.translated(canvas.getPosition().add(width/4+.1f, -height/4));
@@ -158,7 +173,7 @@ public class ICWarsInfoPanel implements Graphics {
 
         unitDamageText.setRelativeTransform(characteristicsTransform);
         unitDamageText.setText("DMG: " + unit.getDamage());
-       unitDamageText.draw(canvas);
+        unitDamageText.draw(canvas);
     }
 
 }
