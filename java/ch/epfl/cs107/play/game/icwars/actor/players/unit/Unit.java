@@ -28,7 +28,7 @@ public abstract class Unit extends ICWarsActor implements Interactable, Interact
     private int radius;
     private boolean unitIsUsed;
     private ICWarsBehavior.ICWarsCellType cellType;
-    private ICWarsRange updatedRange = new ICWarsRange();
+
     private int cellStars;
     private int defenseStars;
     private UnitInteractionHandler handler;
@@ -58,10 +58,9 @@ public abstract class Unit extends ICWarsActor implements Interactable, Interact
             this.maxHp = 5;
         }
 
-        //handler = new ICWarsUnitInteractionHandler();
-
         for (int x = Math.max(0, fromX - radius); x <= Math.min(getOwnerArea().getWidth() - 1, fromX + radius); ++x) {
             for (int y = Math.max(0, fromY - radius); y <= Math.min(getOwnerArea().getHeight() - 1, fromY + radius); ++y) {
+
                 DiscreteCoordinates coordinates = new DiscreteCoordinates(x, y);
 
                 boolean hasLeftEdge = false;
@@ -69,16 +68,17 @@ public abstract class Unit extends ICWarsActor implements Interactable, Interact
                 boolean hasRightEdge = false;
                 boolean hasDownEdge = false;
 
-                if (x > fromX - radius && x > 0) {
+                if (x > 0 && x > fromX - radius) {
                     hasLeftEdge = true;
                 }
-                if (y < fromY + radius && y < getOwnerArea().getHeight()) {
+                if (y < getOwnerArea().getHeight() - 1 && y < fromY + radius) {
                     hasUpEdge = true;
                 }
-                if (x < fromX + radius && x < getOwnerArea().getWidth()) {
+
+                if (x < getOwnerArea().getWidth() - 1 && x < fromX + radius) {
                     hasRightEdge = true;
                 }
-                if (y > fromY - radius && y > 0) {
+                if (y > 0 && y > fromY - radius) {
                     hasDownEdge = true;
                 }
                 range.addNode(coordinates, hasLeftEdge, hasUpEdge, hasRightEdge, hasDownEdge);
@@ -222,12 +222,13 @@ public abstract class Unit extends ICWarsActor implements Interactable, Interact
      */
     public void updateRange(int radius, DiscreteCoordinates newPosition) {
 
-        //Utiliser getCurrentMainCellCoordinates()
+        ICWarsRange updatedRange = new ICWarsRange();
+
         this.fromX = newPosition.x;
         this.fromY = newPosition.y;
 
-        for (int x = Math.max(0, fromX - radius); x <= Math.min(getOwnerArea().getWidth(), fromX + radius); ++x) {
-            for (int y = Math.max(0, fromY - radius); y <= Math.min(getOwnerArea().getHeight(), fromY + radius); ++y) {
+        for (int x = Math.max(0, fromX - radius); x <= Math.min(getOwnerArea().getWidth() - 1, fromX + radius); ++x) {
+            for (int y = Math.max(0, fromY - radius); y <= Math.min(getOwnerArea().getHeight() - 1, fromY + radius); ++y) {
 
                 DiscreteCoordinates coordinates = new DiscreteCoordinates(x, y);
 
@@ -236,24 +237,23 @@ public abstract class Unit extends ICWarsActor implements Interactable, Interact
                 boolean hasRightEdge = false;
                 boolean hasDownEdge = false;
 
-                if (x > fromX - radius && x > 0) {
+                if (x > 0 && x > fromX - radius) {
                     hasLeftEdge = true;
                 }
-                if (y < fromY + radius && y < getOwnerArea().getHeight()) {
+                if (y < getOwnerArea().getHeight() - 1 && y < fromY + radius) {
                     hasUpEdge = true;
                 }
-                if (x < fromX + radius && x < getOwnerArea().getWidth()) {
+
+                if (x < getOwnerArea().getWidth() - 1 && x < fromX + radius) {
                     hasRightEdge = true;
                 }
-                if (y > fromY - radius && y > 0) {
+                if (y > 0 && y > fromY - radius) {
                     hasDownEdge = true;
                 }
                 updatedRange.addNode(coordinates, hasLeftEdge, hasUpEdge, hasRightEdge, hasDownEdge);
             }
         }
-        System.out.println("UPDATED RANGE : " + updatedRange);
         this.range = updatedRange;
-        System.out.println("RANGE : " + this.range);
     }
 
     /**
@@ -331,7 +331,7 @@ public abstract class Unit extends ICWarsActor implements Interactable, Interact
      * @return the range of the unit
      */
     public ICWarsRange getRange(){
-        return updatedRange;
+        return this.range;
     }
 
     @Override
@@ -367,8 +367,4 @@ public abstract class Unit extends ICWarsActor implements Interactable, Interact
         }
     }
 }
-
-// Déplacer l'unit vers l'unit éliminée.
-// Gérer le "fantôme" de l'unit éliminée.
-// Gérer la fin de partie / Changement de niveau.
 

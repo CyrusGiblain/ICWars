@@ -269,5 +269,4 @@ public class ICWars extends AreaGame {
     }
 }
 // Interaction avec les unités à finir.
-// Parfois problème de range qui s'affiche en double.
 // IA à faire.
