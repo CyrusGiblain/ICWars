@@ -146,7 +146,7 @@ public abstract class Unit extends ICWarsActor implements Interactable, Interact
 
     @Override
     public boolean takeCellSpace() {
-        return true;
+            return true;
     }
 
     /**

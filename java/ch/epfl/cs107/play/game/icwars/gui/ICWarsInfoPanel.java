@@ -92,13 +92,14 @@ public class ICWarsInfoPanel implements Graphics {
 		if (cellType != null)
 		    drawCellDetails(canvas, height, width);
 
-		if (this.unit != null) {
-            if (!this.unit.takeCellSpace()) {
-                this.setUnit(null);
-            } else {
-                drawUnitDetails(canvas, height, width);
-            }
+        //for units : is mouse over ?
 
+		if (this.unit != null) {
+                if (!this.unit.takeCellSpace()) {
+                    this.setUnit(null);
+                } else {
+                    drawUnitDetails(canvas, height, width);
+                }
         }
     }
 

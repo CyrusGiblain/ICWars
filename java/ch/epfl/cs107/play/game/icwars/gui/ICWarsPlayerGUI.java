@@ -66,10 +66,6 @@ public class ICWarsPlayerGUI implements Graphics {
      */
     public void setCellUnit(Unit cellUnit){
         infoPanel.setUnit(cellUnit);
-        //if (player.changePosition()) {
-
-        //}
-        //this.cellUnit = cellUnit;
     }
 
     /**

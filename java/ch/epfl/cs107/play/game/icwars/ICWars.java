@@ -228,11 +228,11 @@ public class ICWars extends AreaGame {
         super.end();
 
         if (pointsJoueurBleu > pointsJoueurOrange) {
-            System.out.println("Le joueur bleu a remporté la partie " + pointsJoueurBleu + "-" + pointsJoueurOrange + ".");
+            System.out.println("Le joueur bleu a remporté la partie " + pointsJoueurBleu + " à " + pointsJoueurOrange + ".");
         } else if (pointsJoueurBleu == pointsJoueurOrange) {
             System.out.println("La partie se termine sur un match nul " + pointsJoueurBleu + "-" + pointsJoueurOrange + ".");
         } else {
-            System.out.println("Le joueur orange a remporté la partie " + pointsJoueurOrange + "-" + pointsJoueurBleu + ".");
+            System.out.println("Le joueur orange a remporté la partie " + pointsJoueurOrange + " à " + pointsJoueurBleu + ".");
         }
         System.exit(0);
     }

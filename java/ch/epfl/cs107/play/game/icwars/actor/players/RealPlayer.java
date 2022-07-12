@@ -301,6 +301,8 @@ public class RealPlayer extends ICWarsPlayer implements Interactable {
         @Override
         public void interactWith(ICWarsBehavior.ICWarsCell cell){
             cellType = cell.getType();
+            icWarsPlayerGUI.setCellUnit(null);
+
 
         }
 
