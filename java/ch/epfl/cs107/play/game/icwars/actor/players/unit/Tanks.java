@@ -12,8 +12,7 @@ import ch.epfl.cs107.play.window.Canvas;
 
 import java.util.List;
 
-import static ch.epfl.cs107.play.game.icwars.actor.ICWarsActor.faction.ALLIE;
-import static ch.epfl.cs107.play.game.icwars.actor.ICWarsActor.faction.ENNEMIE;
+import static ch.epfl.cs107.play.game.icwars.actor.ICWarsActor.faction.*;
 
 public class Tanks extends Unit{
 
@@ -22,6 +21,7 @@ public class Tanks extends Unit{
     private final int maxHp = 10;
     private Sprite tankAllie = new Sprite("icwars/friendlyTank", 1.5f, 1.5f,  this, null, new Vector(-0.25f, -0.25f));
     private Sprite tankEnnemi = new Sprite("icwars/enemyTank", 1.5f, 1.5f, this, null, new Vector(-0.25f, -0.25f));
+    private Sprite tankEnnemi2 = new Sprite("icwars/enemy2Tank", 1f, 1f, this, null, new Vector(0f, 0f));
     private ICWarsArea area;
     private faction camp;
     Sprite tank;
@@ -45,8 +45,10 @@ public class Tanks extends Unit{
     public String getName() {
         if (camp.equals(ALLIE)) {
             return "icwars/friendlyTank";
-        } else {
+        } else if (camp.equals(ENNEMI1)){
             return "icwars/enemyTank";
+        } else {
+            return "icwars/enemy2Tank";
         }
     }
 
@@ -58,13 +60,18 @@ public class Tanks extends Unit{
                 tankAllie.setAlpha(1.0f);
                 tankAllie.draw(canvas);
             }
-            if (camp == ENNEMIE) {
+            if (camp == ENNEMI1) {
                 tankEnnemi.setAlpha(1.0f);
                 tankEnnemi.draw(canvas);
             }
+            if (camp == ENNEMI2) {
+                tankEnnemi2.setAlpha(1.0f);
+                tankEnnemi2.draw(canvas);
+            }
         } else {
             if (camp == ALLIE) tankAllie.draw(canvas);
-            if (camp == ENNEMIE) tankEnnemi.draw(canvas);
+            if (camp == ENNEMI1) tankEnnemi.draw(canvas);
+            if (camp == ENNEMI2) tankEnnemi2.draw(canvas);
             unit.setAlpha(0.5f);
         }
     }
@@ -110,9 +117,16 @@ public class Tanks extends Unit{
     }
 
     /**
-     * @return the Sprite of the enemy tank
+     * @return the Sprite of the enemy 1 tank
      */
-    public Sprite getTankEnnemi() {
+    public Sprite getTankEnnemi1() {
         return tankEnnemi;
+    }
+
+    /**
+     * @return the Sprite of the enemy 2 tank
+     */
+    public Sprite getTankEnnemi2() {
+        return tankEnnemi2;
     }
 }

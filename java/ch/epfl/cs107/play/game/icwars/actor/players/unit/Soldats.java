@@ -19,8 +19,8 @@ import ch.epfl.cs107.play.window.Canvas;
 import java.util.List;
 
 import static ch.epfl.cs107.play.game.icwars.actor.ICWarsActor.faction.ALLIE;
-import static ch.epfl.cs107.play.game.icwars.actor.ICWarsActor.faction.ENNEMIE;
-//import static ch.epfl.cs107.play.game.icwars.actor.ICWarsActor.faction.ENNEMIE2;
+import static ch.epfl.cs107.play.game.icwars.actor.ICWarsActor.faction.ENNEMI1;
+import static ch.epfl.cs107.play.game.icwars.actor.ICWarsActor.faction.ENNEMI2;
 //import static ch.epfl.cs107.play.game.icwars.actor.ICWarsActor.faction.ENNEMIE3;
 
 public class Soldats extends Unit {
@@ -30,6 +30,7 @@ public class Soldats extends Unit {
     private int maxHp = 5;
     private Sprite soldatAllie = new Sprite("icwars/friendlySoldier", 1.5f, 1.5f, this, null, new Vector(-0.25f, -0.25f));
     private Sprite soldatEnnemi = new Sprite("icwars/enemySoldier", 1.5f, 1.5f, this, null, new Vector(-0.25f, -0.25f));
+    private Sprite soldatEnnemi2 = new Sprite("icwars/enemy2Soldier", 1f, 1f, this, null, new Vector(0f, 0f));
     private ICWarsArea area;
     faction camp;
     private List<Action> listOfActions;
@@ -58,8 +59,10 @@ public class Soldats extends Unit {
     public String getName() {
         if (camp.equals(ALLIE)) {
             return "icwars/friendlySoldier";
-        } else {
+        } else if (camp.equals(ENNEMI1)){
             return "icwars/enemySoldier";
+        } else {
+            return "icwars/enemy2Soldier";
         }
     }
 
@@ -70,13 +73,18 @@ public class Soldats extends Unit {
                 soldatAllie.setAlpha(1.0f);
                 soldatAllie.draw(canvas);
             }
-            if (camp == ENNEMIE) {
+            if (camp == ENNEMI1) {
                 soldatEnnemi.setAlpha(1.0f);
                 soldatEnnemi.draw(canvas);
             }
+            if (camp == ENNEMI2) {
+                soldatEnnemi2.setAlpha(1.0f);
+                soldatEnnemi2.draw(canvas);
+            }
         } else {
             if (camp == ALLIE) soldatAllie.draw(canvas);
-            if (camp == ENNEMIE) soldatEnnemi.draw(canvas);
+            if (camp == ENNEMI1) soldatEnnemi.draw(canvas);
+            if (camp == ENNEMI2) soldatEnnemi2.draw(canvas);
             unit.setAlpha(0.5f);
         }
     }
@@ -111,10 +119,16 @@ public class Soldats extends Unit {
     }
 
     /**
-     * @return the Sprite of the enemy soldier
+     * @return the Sprite of the enemy 1 soldier
      */
-    public Sprite getSoldatEnnemi() {
+    public Sprite getSoldatEnnemi1() {
         return soldatEnnemi;
     }
 
+    /**
+     * @return the Sprite of the enemy 2 soldier
+     */
+    public Sprite getSoldatEnnemi2() {
+        return soldatEnnemi2;
+    }
 }

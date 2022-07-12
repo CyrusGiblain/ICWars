@@ -24,8 +24,8 @@ import java.util.List;
 
 public class RealPlayer extends ICWarsPlayer implements Interactable {
     private float hp;
-    private Sprite sprite;
-    private String spriteName;
+    //private Sprite sprite;
+    //private String spriteName;
     private ICWarsPlayerGUI icWarsPlayerGUI;
     // Animation duration in frame number
     //to Change before rendu
@@ -45,12 +45,6 @@ public class RealPlayer extends ICWarsPlayer implements Interactable {
     public RealPlayer(ICWarsArea owner, DiscreteCoordinates position, faction camp, Unit... units) {
         super(owner, position, camp, units);
         this.area = owner;
-        if (camp == faction.ALLIE) {
-            spriteName = "icwars/allyCursor";
-        } else {
-            spriteName = "icwars/enemyCursor";
-        }
-        sprite = new Sprite(spriteName, 1.f, 1.f,this);
         this.icWarsPlayerGUI = new ICWarsPlayerGUI(10.0f, this);
         resetMotion();
     }

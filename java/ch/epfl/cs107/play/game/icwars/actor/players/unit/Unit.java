@@ -169,19 +169,19 @@ public abstract class Unit extends ICWarsActor implements Interactable, Interact
             if (this instanceof Tanks) {
                 if (this.camp == faction.ALLIE) {
                     unit = ((Tanks) this).getTankAllie();
-                } else {
-                    if (this.camp == faction.ENNEMIE) {
-                        unit = ((Tanks) this).getTankEnnemi();
-                    }
+                } else if (this.camp == faction.ENNEMI1){
+                    unit = ((Tanks) this).getTankEnnemi1();
+                    } else {
+                    unit = ((Tanks) this).getTankEnnemi2();
                 }
             } else {
                 if (this instanceof Soldats) {
                     if (this.camp == faction.ALLIE) {
                         unit = ((Soldats) this).getSoldatAllie();
-                    } else {
-                        if (this.camp == faction.ENNEMIE) {
-                            unit = ((Soldats) this).getSoldatEnnemi();
-                        }
+                    } else if (this.camp == faction.ENNEMI1){
+                        unit = ((Soldats) this).getSoldatEnnemi1();
+                        } else {
+                        unit = ((Soldats) this).getSoldatEnnemi2();
                     }
                 }
             }

@@ -28,7 +28,8 @@ public abstract class ICWarsArea extends Area {
      * @return the DiscretePosition of the position
      */
     public abstract DiscreteCoordinates getPlayerSpawnPosition();
-    public abstract DiscreteCoordinates getEnemySpawnPosition();
+    public abstract DiscreteCoordinates getEnemy1SpawnPosition();
+    public abstract DiscreteCoordinates getEnemy2SpawnPosition();
 
     /**
      * Method that enables to start the game

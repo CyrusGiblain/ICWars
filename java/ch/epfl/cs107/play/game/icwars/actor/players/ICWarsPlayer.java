@@ -42,8 +42,10 @@ public class ICWarsPlayer extends ICWarsActor implements Interactor {
         this.coords = position;
         if (camp == faction.ALLIE) {
             spriteName = "icwars/allyCursor";
-        } else {
+        } else if (camp == faction.ENNEMI1) {
             spriteName = "icwars/enemyCursor";
+        } else {
+            spriteName = "cellOver";
         }
         sprite = new Sprite(spriteName, 1.f, 1.f,this);
     }
@@ -64,7 +66,6 @@ public class ICWarsPlayer extends ICWarsActor implements Interactor {
 
         for (int i = 0; i < units.size(); ++i) {
             if (units.get(i).isDead()) {
-                //units.get(i).leaveArea();
                 units.remove(i);
             }
         }
@@ -157,7 +158,6 @@ public class ICWarsPlayer extends ICWarsActor implements Interactor {
     // Method to unregister the unit from the area
     public void leaveArea(){
         for (Unit unit : units) {
-            //getOwnerArea().unregisterActor(unit);
             unit.leaveArea();
         }
     }
