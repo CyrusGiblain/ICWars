@@ -146,6 +146,7 @@ public class ICWarsPlayer extends ICWarsActor implements Interactor {
         for (Unit unit : units) {
             unit.draw(canvas);
         }
+        if (!this.isDefeated())
         sprite.draw(canvas);
     }
 
@@ -166,7 +167,7 @@ public class ICWarsPlayer extends ICWarsActor implements Interactor {
      * @return true is the ICWarsPlayer is defeated
      */
     public boolean isDefeated(){
-        return units.isEmpty();
+        return units.size() == 0;
     }
 
     //4 methods of Interactable

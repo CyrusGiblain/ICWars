@@ -313,7 +313,7 @@ public abstract class Area implements Playable, PauseMenu.Pausable {
         }
     }
 
-    public final void purgeRegistration() {
+    final void purgeRegistration() {
         // PART 1
         // - Register actors
         for (Actor actor : registeredActors) {

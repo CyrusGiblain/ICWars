@@ -82,7 +82,8 @@ public class RealPlayer extends ICWarsPlayer implements Interactable {
 
                 if (enter.isReleased()) {
                     for (Unit unit : this.getUnits()) {
-                        if (unit.getCurrentCells().equals(this.getCurrentCells())) {
+                        if (unit.getCurrentCells().equals(this.getCurrentCells()) &&
+                        !unit.theUnitHasBeenUsed()) {
                             currentState = ICWarsPlayerCurrentState.SELECT_CELL;
                         }
 
@@ -186,20 +187,13 @@ public class RealPlayer extends ICWarsPlayer implements Interactable {
     @Override
     public void draw(Canvas canvas) {
 
-        sprite.draw(canvas);
+        super.draw(canvas);
+
         icWarsPlayerGUI.draw(canvas);
 
         if(currentState == ICWarsPlayerCurrentState.ACTION && action != null){
             action.draw(canvas);
         }
-    }
-
-    public boolean isWeak() {
-        return (hp <= 0.f);
-    }
-
-    public void strengthen() {
-        hp = 10;
     }
 
     @Override
@@ -298,15 +292,6 @@ public class RealPlayer extends ICWarsPlayer implements Interactable {
             icWarsPlayerGUI.setCellUnit(null);
 
 
-        }
-
-
-
-    }
-    // Method we used previously to manually select a unit
-    public void selectUnit(int index) {
-        if (index < units.size()) {
-            this.selectedUnit = units.get(index);
         }
     }
 

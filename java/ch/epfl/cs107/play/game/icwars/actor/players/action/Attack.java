@@ -39,6 +39,7 @@ public class Attack extends Action {
         if (!enemyUnitsInRange.isEmpty()) {
             cursor.setAnchor(canvas.getPosition().add(1, 0));
             cursor.draw(canvas);
+            cursor.setDepth(2);
         }
     }
 
@@ -54,6 +55,7 @@ public class Attack extends Action {
 
         Unit currentUnit = player.getSelectedUnit();
         enemyUnitsInRange = getEnemyUnitsInRange(player);
+
 
         if (tab.isReleased()) {
             goBack(player);
@@ -82,14 +84,8 @@ public class Attack extends Action {
                 attackedUnit.setHp(attackedUnit, nouveauxHP);
 
                 if (attackedUnit.getHp() == 0) {
-
                     enemyUnitsInRange.remove(attackedUnitIndex);
                     attackedUnit.leaveArea();
-
-                    area.purgeRegistration();
-
-                    DiscreteCoordinates c = new DiscreteCoordinates((int) attackedUnit.getPosition().x, (int) attackedUnit.getPosition().y);
-                    currentUnit.changePosition(c);
                 }
 
                 player.selectedUnit.setIsUsed(true);
@@ -134,7 +130,6 @@ public class Attack extends Action {
                 listOfEnemyUnitsInRange.add(unit);
             }
         }
-        //System.out.println(listOfEnemyUnitsInRange.size());
         return listOfEnemyUnitsInRange;
     }
 

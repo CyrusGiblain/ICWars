@@ -28,8 +28,6 @@ public class ICWars extends AreaGame {
     private RealPlayer firstPlayerOfTheList;
     private RealPlayer secondPlayerOfTheList;
     private RealPlayer thirdPlayerOfTheList;
-    //private RealPlayer thirdPlayerOfTheList;
-    //private RealPlayer fourthPlayerOfTheList;
     private ArrayList<Unit> units = new ArrayList<>();
     private ICWarsCurrentState icWarsCurrentState = ICWarsCurrentState.INIT;
     private List<ICWarsPlayer> listOfPlayersWaitingForTheCurrentRound;
@@ -37,6 +35,8 @@ public class ICWars extends AreaGame {
     private ICWarsPlayer currentPlayer;
     private int pointsJoueurBleu = 0;
     private int pointsJoueurOrange = 0;
+    private int pointsJoueur3 = 0;
+    private boolean troisJoueurs = false;
 
     private final String[] areas = {"icwars/Level0", "icwars/Level1"};
     private int areaIndex = 0;
@@ -49,10 +49,13 @@ public class ICWars extends AreaGame {
 
         Button keyR =  keyboard.get(Keyboard.R);
 
+        // PROBLEME
         if (keyR.isReleased()) {
             listOfPlayers.clear();
             listOfPlayersWaitingForTheCurrentRound.clear();
             listOfPlayersWaitingForNextTurn.clear();
+            areaIndex = 0;
+            troisJoueurs = false;
             begin(getWindow(), getFileSystem());
             icWarsCurrentState = ICWarsCurrentState.INIT;
         }
@@ -138,9 +141,12 @@ public class ICWars extends AreaGame {
                     if (faction == ALLIE) {
                         System.out.println("Le joueur bleu a gagné la manche n°" + (areaIndex + 1) + ".");
                         pointsJoueurBleu++;
-                    } else {
+                    } else if (faction == ENNEMI1){
                         System.out.println("Le joueur orange a gagné la manche n°" + (areaIndex + 1) + ".");
                         pointsJoueurOrange++;
+                    } else {
+                        System.out.println("Le joueur n°3 a gagné la manche n°" + (areaIndex + 1) + ".");
+                        pointsJoueur3++;
                     }
                     icWarsCurrentState = ICWarsCurrentState.END;
                 } else {
@@ -192,17 +198,17 @@ public class ICWars extends AreaGame {
         area = (ICWarsArea) setCurrentArea(areaKey, true);
 
         DiscreteCoordinates coordsALLY = area.getPlayerSpawnPosition();
-        DiscreteCoordinates coordsEnnemy1 = area.getEnemy1SpawnPosition();
+        DiscreteCoordinates coordsEnemy1 = area.getEnemy1SpawnPosition();
         DiscreteCoordinates coordsEnemy2 = area.getEnemy2SpawnPosition();
 
-        DiscreteCoordinates coordsOfTheTankOfTheFirstRealPlayer = new DiscreteCoordinates(2, 5);
-        DiscreteCoordinates coordsOfTheSoldatOfTheFirstRealPlayer = new DiscreteCoordinates(3, 5);
+        DiscreteCoordinates coordsOfTheTankOfTheFirstRealPlayer = new DiscreteCoordinates(0, 5);
+        DiscreteCoordinates coordsOfTheSoldatOfTheFirstRealPlayer = new DiscreteCoordinates(1, 5);
 
-        DiscreteCoordinates coordsOfTheTankOfTheSecondRealPlayer = new DiscreteCoordinates(8, 5);
-        DiscreteCoordinates coordsOfTheSoldatOfTheSecondRealPlayer = new DiscreteCoordinates(9, 5);
+        DiscreteCoordinates coordsOfTheTankOfTheSecondRealPlayer = new DiscreteCoordinates(9, 5);
+        DiscreteCoordinates coordsOfTheSoldatOfTheSecondRealPlayer = new DiscreteCoordinates(8, 5);
 
-        DiscreteCoordinates coordsOfTheTankOfTheThirdRealPlayer = new DiscreteCoordinates(8, 4);
-        DiscreteCoordinates coordsOfTheSoldatOfTheThirdRealPlayer = new DiscreteCoordinates(9, 4);
+        DiscreteCoordinates coordsOfTheTankOfTheThirdRealPlayer = new DiscreteCoordinates(4, 0);
+        DiscreteCoordinates coordsOfTheSoldatOfTheThirdRealPlayer = new DiscreteCoordinates(5, 0);
 
         Tanks tankFirstPlayer = new Tanks(area, coordsOfTheTankOfTheFirstRealPlayer, ALLIE);
         Soldats soldatFirstPlayer = new Soldats(area, coordsOfTheSoldatOfTheFirstRealPlayer, ALLIE);
@@ -210,7 +216,7 @@ public class ICWars extends AreaGame {
 
         Tanks tankSecondPlayer = new Tanks(area, coordsOfTheTankOfTheSecondRealPlayer, ENNEMI1);
         Soldats soldatSecondPlayer = new Soldats(area, coordsOfTheSoldatOfTheSecondRealPlayer, ENNEMI1);
-        secondPlayerOfTheList = new RealPlayer(area, coordsEnnemy1, ENNEMI1, tankSecondPlayer, soldatSecondPlayer);
+        secondPlayerOfTheList = new RealPlayer(area, coordsEnemy1, ENNEMI1, tankSecondPlayer, soldatSecondPlayer);
 
         Tanks tankThirdPlayer = new Tanks(area, coordsOfTheTankOfTheThirdRealPlayer, ENNEMI2);
         Soldats soldatThirdPlayer = new Soldats(area, coordsOfTheSoldatOfTheThirdRealPlayer, ENNEMI2);
@@ -220,21 +226,26 @@ public class ICWars extends AreaGame {
         area.units.add(tankSecondPlayer);
         area.units.add(soldatSecondPlayer);
 
-
         listOfPlayers.add(firstPlayerOfTheList);
         listOfPlayers.add(secondPlayerOfTheList);
-
 
         firstPlayerOfTheList.centerCamera();
 
         firstPlayerOfTheList.enterArea(area, coordsALLY);
-        secondPlayerOfTheList.enterArea(area, coordsEnnemy1);
+        secondPlayerOfTheList.enterArea(area, coordsEnemy1);
 
-        System.out.println("Souhaitez-vous jouer à 3 ?");
-        Scanner scanner = new Scanner(System.in);
-        String reponse = scanner.nextLine();
+        if (areaIndex == 0) {
 
-        if (reponse.equals("oui") || reponse.equals("Oui")) {
+            System.out.println("Souhaitez-vous jouer à 3 ?");
+            Scanner scanner = new Scanner(System.in);
+            String reponse = scanner.nextLine();
+
+            if (reponse.equals("oui") || reponse.equals("Oui")) {
+                troisJoueurs = true;
+            }
+        }
+
+        if (troisJoueurs) {
 
             thirdPlayerOfTheList = new RealPlayer(area, coordsEnemy2, ENNEMI2, tankThirdPlayer, soldatThirdPlayer);
 
@@ -250,12 +261,28 @@ public class ICWars extends AreaGame {
 
         super.end();
 
-        if (pointsJoueurBleu > pointsJoueurOrange) {
-            System.out.println("Le joueur bleu a remporté la partie " + pointsJoueurBleu + " à " + pointsJoueurOrange + ".");
-        } else if (pointsJoueurBleu == pointsJoueurOrange) {
-            System.out.println("La partie se termine sur un match nul " + pointsJoueurBleu + "-" + pointsJoueurOrange + ".");
+        if (listOfPlayers.size() == 3) {
+            if (pointsJoueurBleu > pointsJoueurOrange && pointsJoueurBleu > pointsJoueur3) {
+                System.out.println("Le joueur bleu a gagné la partie avec " + pointsJoueurBleu + " points.");
+            } else if (pointsJoueurOrange > pointsJoueurBleu && pointsJoueurOrange > pointsJoueur3) {
+                System.out.println("Le joueur orange a gagné la partie avec " + pointsJoueurOrange + " points.");
+            } else if (pointsJoueur3 > pointsJoueurBleu && pointsJoueur3 > pointsJoueurOrange) {
+                System.out.println("Le joueur n°3 a gagné la partie avec " + pointsJoueur3 + " points.");
+            } else if (pointsJoueurBleu == 0 && pointsJoueurOrange != 0 && pointsJoueur3 != 0){
+                System.out.println("Le joueur bleu a perdu la partie puisqu'il n'a pas marqué de points.");
+            } else if (pointsJoueurOrange == 0 && pointsJoueurBleu != 0 && pointsJoueur3 != 0) {
+                System.out.println("Le joueur orange a perdu la partie puisqu'il n'a pas marqué de points.");
+            } else if (pointsJoueur3 == 0 && pointsJoueurBleu != 0 && pointsJoueurOrange != 0) {
+                System.out.println("Le joueur n°3 a perdu la partie puisqu'il n'a pas marqué de points.");
+            }
         } else {
-            System.out.println("Le joueur orange a remporté la partie " + pointsJoueurOrange + " à " + pointsJoueurBleu + ".");
+            if (pointsJoueurBleu > pointsJoueurOrange) {
+                System.out.println("Le joueur bleu a gagné la partie 2 à 0.");
+            } else if (pointsJoueurBleu == pointsJoueurOrange) {
+                System.out.println("La partie se termine par un match nul 1-1.");
+            } else {
+                System.out.println("Le joueur orange a gagné la partie 2 à 0");
+            }
         }
         System.exit(0);
     }
@@ -263,11 +290,10 @@ public class ICWars extends AreaGame {
     //Method to switch from the first area to the second
     protected void switchArea() {
 
-        listOfPlayers.clear();
-        listOfPlayersWaitingForTheCurrentRound.clear();
-        listOfPlayersWaitingForNextTurn.clear();
-
         if (areaIndex == 0) {
+            listOfPlayers.clear();
+            listOfPlayersWaitingForTheCurrentRound.clear();
+            listOfPlayersWaitingForNextTurn.clear();
             areaIndex = 1;
             begin(getWindow(), getFileSystem());
         } else {
@@ -291,5 +317,4 @@ public class ICWars extends AreaGame {
         END;
     }
 }
-// Interaction avec les unités à finir.
 // IA à faire.
