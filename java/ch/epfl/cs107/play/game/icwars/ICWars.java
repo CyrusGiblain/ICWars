@@ -16,6 +16,7 @@ import ch.epfl.cs107.play.window.Button;
 import ch.epfl.cs107.play.window.Keyboard;
 import ch.epfl.cs107.play.window.Window;
 
+import java.sql.SQLOutput;
 import java.util.*;
 
 import static ch.epfl.cs107.play.game.icwars.actor.ICWarsActor.faction.*;
@@ -36,6 +37,8 @@ public class ICWars extends AreaGame {
     private int pointsJoueurBleu = 0;
     private int pointsJoueurOrange = 0;
     private int pointsJoueur3 = 0;
+    private boolean joueurSeul = false;
+    private boolean deuxJoueurs = false;
     private boolean troisJoueurs = false;
 
     private final String[] areas = {"icwars/Level0", "icwars/Level1"};
@@ -55,6 +58,8 @@ public class ICWars extends AreaGame {
             listOfPlayersWaitingForTheCurrentRound.clear();
             listOfPlayersWaitingForNextTurn.clear();
             areaIndex = 0;
+            joueurSeul = false;
+            deuxJoueurs = false;
             troisJoueurs = false;
             begin(getWindow(), getFileSystem());
             icWarsCurrentState = ICWarsCurrentState.INIT;
@@ -216,36 +221,67 @@ public class ICWars extends AreaGame {
 
         Tanks tankSecondPlayer = new Tanks(area, coordsOfTheTankOfTheSecondRealPlayer, ENNEMI1);
         Soldats soldatSecondPlayer = new Soldats(area, coordsOfTheSoldatOfTheSecondRealPlayer, ENNEMI1);
-        secondPlayerOfTheList = new RealPlayer(area, coordsEnemy1, ENNEMI1, tankSecondPlayer, soldatSecondPlayer);
 
         Tanks tankThirdPlayer = new Tanks(area, coordsOfTheTankOfTheThirdRealPlayer, ENNEMI2);
         Soldats soldatThirdPlayer = new Soldats(area, coordsOfTheSoldatOfTheThirdRealPlayer, ENNEMI2);
 
         area.units.add(tankFirstPlayer);
         area.units.add(soldatFirstPlayer);
-        area.units.add(tankSecondPlayer);
-        area.units.add(soldatSecondPlayer);
 
         listOfPlayers.add(firstPlayerOfTheList);
-        listOfPlayers.add(secondPlayerOfTheList);
 
         firstPlayerOfTheList.centerCamera();
 
         firstPlayerOfTheList.enterArea(area, coordsALLY);
-        secondPlayerOfTheList.enterArea(area, coordsEnemy1);
 
         if (areaIndex == 0) {
 
-            System.out.println("Souhaitez-vous jouer à 3 ?");
-            Scanner scanner = new Scanner(System.in);
-            String reponse = scanner.nextLine();
+            while (!joueurSeul && !deuxJoueurs && !troisJoueurs) {
+                Scanner scanner = new Scanner(System.in);
 
-            if (reponse.equals("oui") || reponse.equals("Oui")) {
-                troisJoueurs = true;
+                System.out.println("Souhaitez-vous jouer seul ?");
+                String reponse1 = scanner.nextLine();
+
+                if (reponse1.equals("oui") || reponse1.equals("Oui")) {
+                    joueurSeul = true;
+                } else {
+                    System.out.println("Souhaitez-vous jouer à 2 ?");
+                    String reponse2 = scanner.nextLine();
+                    if (reponse2.equals("oui") || reponse2.equals("Oui")) {
+                        deuxJoueurs = true;
+                    } else {
+                        System.out.println("Souhaitez-vous jouer à 3 ?");
+                        String reponse3 = scanner.nextLine();
+                        if (reponse3.equals("oui") || reponse3.equals("Oui")) {
+                            troisJoueurs = true;
+                        }
+                    }
+                }
             }
         }
 
+        if (joueurSeul) {
+            // Ajouter le joueur IA ici.
+        }
+
+        if (deuxJoueurs) {
+
+            secondPlayerOfTheList = new RealPlayer(area, coordsEnemy1, ENNEMI1, tankSecondPlayer, soldatSecondPlayer);
+
+            area.units.add(tankSecondPlayer);
+            area.units.add(soldatSecondPlayer);
+            listOfPlayers.add(secondPlayerOfTheList);
+            secondPlayerOfTheList.enterArea(area, coordsEnemy1);
+        }
+
         if (troisJoueurs) {
+
+            secondPlayerOfTheList = new RealPlayer(area, coordsEnemy1, ENNEMI1, tankSecondPlayer, soldatSecondPlayer);
+
+            area.units.add(tankSecondPlayer);
+            area.units.add(soldatSecondPlayer);
+            listOfPlayers.add(secondPlayerOfTheList);
+            secondPlayerOfTheList.enterArea(area, coordsEnemy1);
 
             thirdPlayerOfTheList = new RealPlayer(area, coordsEnemy2, ENNEMI2, tankThirdPlayer, soldatThirdPlayer);
 
