@@ -2,6 +2,7 @@ package ch.epfl.cs107.play.game.icwars;
 
 import ch.epfl.cs107.play.game.areagame.AreaGame;
 import ch.epfl.cs107.play.game.icwars.actor.ICWarsActor;
+import ch.epfl.cs107.play.game.icwars.actor.players.AIPlayer;
 import ch.epfl.cs107.play.game.icwars.actor.players.unit.Soldats;
 import ch.epfl.cs107.play.game.icwars.actor.players.unit.Tanks;
 import ch.epfl.cs107.play.game.icwars.actor.players.unit.Unit;
@@ -24,11 +25,11 @@ import static ch.epfl.cs107.play.game.icwars.actor.ICWarsActor.faction.*;
 public class ICWars extends AreaGame {
 
     public ICWarsArea area;
-    //private RealPlayer player;
     private List<ICWarsPlayer> listOfPlayers = new ArrayList<>();
     private RealPlayer firstPlayerOfTheList;
     private RealPlayer secondPlayerOfTheList;
     private RealPlayer thirdPlayerOfTheList;
+    private AIPlayer aiPlayer;
     private ArrayList<Unit> units = new ArrayList<>();
     private ICWarsCurrentState icWarsCurrentState = ICWarsCurrentState.INIT;
     private List<ICWarsPlayer> listOfPlayersWaitingForTheCurrentRound;
@@ -246,7 +247,20 @@ public class ICWars extends AreaGame {
         }
 
         if (joueurSeul) {
-            // Ajouter le joueur IA ici.
+            //Joueur IA ici.
+            DiscreteCoordinates coordsEnemy1 = area.getEnemy1SpawnPosition();
+
+            DiscreteCoordinates coordsOfTheTankOfTheSecondRealPlayer = new DiscreteCoordinates(9, 5);
+            DiscreteCoordinates coordsOfTheSoldatOfTheSecondRealPlayer = new DiscreteCoordinates(8, 5);
+
+            Tanks tankSecondPlayer = new Tanks(area, coordsOfTheTankOfTheSecondRealPlayer, ENNEMI1);
+            Soldats soldatSecondPlayer = new Soldats(area, coordsOfTheSoldatOfTheSecondRealPlayer, ENNEMI1);
+            aiPlayer = new AIPlayer(area, coordsEnemy1, ENNEMI1, tankSecondPlayer, soldatSecondPlayer);
+
+            area.units.add(tankSecondPlayer);
+            area.units.add(soldatSecondPlayer);
+            listOfPlayers.add(aiPlayer);
+            aiPlayer.enterArea(area, coordsEnemy1);
         }
 
         if (deuxJoueurs) {
