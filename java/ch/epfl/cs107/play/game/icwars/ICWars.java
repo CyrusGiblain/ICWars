@@ -247,7 +247,7 @@ public class ICWars extends AreaGame {
         }
 
         if (joueurSeul) {
-            //Joueur IA ici.
+            //Joueur IA ici (Non fonctionnel pour l'instant)
             DiscreteCoordinates coordsEnemy1 = area.getEnemy1SpawnPosition();
 
             DiscreteCoordinates coordsOfTheTankOfTheSecondRealPlayer = new DiscreteCoordinates(9, 5);
