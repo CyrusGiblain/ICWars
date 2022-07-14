@@ -143,7 +143,7 @@ public class ICWars extends AreaGame {
                 }
 
                 if (listOfPlayersWaitingForNextTurn.size() == 1) {
-                    ICWarsActor.faction faction = ((RealPlayer) listOfPlayersWaitingForNextTurn.get(0)).getCamp();
+                    ICWarsActor.faction faction = (listOfPlayersWaitingForNextTurn.get(0)).getCamp();
                     if (faction == ALLIE) {
                         System.out.println("Le joueur bleu a gagné la manche n°" + (areaIndex + 1) + ".");
                         pointsJoueurBleu++;
@@ -206,8 +206,8 @@ public class ICWars extends AreaGame {
 
         DiscreteCoordinates coordsALLY = area.getPlayerSpawnPosition();
 
-        DiscreteCoordinates coordsOfTheTankOfTheFirstRealPlayer = new DiscreteCoordinates(0, 5);
-        DiscreteCoordinates coordsOfTheSoldatOfTheFirstRealPlayer = new DiscreteCoordinates(1, 5);
+        DiscreteCoordinates coordsOfTheTankOfTheFirstRealPlayer = new DiscreteCoordinates(8, 6);
+        DiscreteCoordinates coordsOfTheSoldatOfTheFirstRealPlayer = new DiscreteCoordinates(0, 2);
 
         Tanks tankFirstPlayer = new Tanks(area, coordsOfTheTankOfTheFirstRealPlayer, ALLIE);
         Soldats soldatFirstPlayer = new Soldats(area, coordsOfTheSoldatOfTheFirstRealPlayer, ALLIE);
@@ -223,26 +223,20 @@ public class ICWars extends AreaGame {
         if (areaIndex == 0) {
 
             while (!joueurSeul && !deuxJoueurs && !troisJoueurs) {
+
                 Scanner scanner = new Scanner(System.in);
 
-                System.out.println("Souhaitez-vous jouer seul ?");
-                String reponse1 = scanner.nextLine();
+                System.out.println("Combien de joueurs êtes-vous ? (3 au maximum)");
+                String reponse = scanner.nextLine();
 
-                if (reponse1.equals("oui") || reponse1.equals("Oui")) {
+                if (reponse.equals("un") || reponse.equals("Un") || reponse.equals("1"))
                     joueurSeul = true;
-                } else {
-                    System.out.println("Souhaitez-vous jouer à 2 ?");
-                    String reponse2 = scanner.nextLine();
-                    if (reponse2.equals("oui") || reponse2.equals("Oui")) {
-                        deuxJoueurs = true;
-                    } else {
-                        System.out.println("Souhaitez-vous jouer à 3 ?");
-                        String reponse3 = scanner.nextLine();
-                        if (reponse3.equals("oui") || reponse3.equals("Oui")) {
-                            troisJoueurs = true;
-                        }
-                    }
-                }
+
+                if (reponse.equals("deux") || reponse.equals("Deux") || reponse.equals("2"))
+                    deuxJoueurs = true;
+
+                if (reponse.equals("trois") || reponse.equals("Trois") || reponse.equals("3"))
+                    troisJoueurs = true;
             }
         }
 
@@ -250,8 +244,8 @@ public class ICWars extends AreaGame {
             //Joueur IA ici (Non fonctionnel pour l'instant)
             DiscreteCoordinates coordsEnemy1 = area.getEnemy1SpawnPosition();
 
-            DiscreteCoordinates coordsOfTheTankOfTheSecondRealPlayer = new DiscreteCoordinates(9, 5);
-            DiscreteCoordinates coordsOfTheSoldatOfTheSecondRealPlayer = new DiscreteCoordinates(8, 5);
+            DiscreteCoordinates coordsOfTheTankOfTheSecondRealPlayer = new DiscreteCoordinates(6, 6);
+            DiscreteCoordinates coordsOfTheSoldatOfTheSecondRealPlayer = new DiscreteCoordinates(5, 6);
 
             Tanks tankSecondPlayer = new Tanks(area, coordsOfTheTankOfTheSecondRealPlayer, ENNEMI1);
             Soldats soldatSecondPlayer = new Soldats(area, coordsOfTheSoldatOfTheSecondRealPlayer, ENNEMI1);
@@ -333,9 +327,13 @@ public class ICWars extends AreaGame {
                 System.out.println("Le joueur orange a perdu la partie puisqu'il n'a pas marqué de points.");
             } else if (pointsJoueur3 == 0 && pointsJoueurBleu != 0 && pointsJoueurOrange != 0) {
                 System.out.println("Le joueur n°3 a perdu la partie puisqu'il n'a pas marqué de points.");
+            } else if (pointsJoueurBleu + pointsJoueurOrange + pointsJoueur3 <= 1) {
+                System.out.println("La partie s'est achevée avant son terme.");
             }
         } else {
-            if (pointsJoueurBleu > pointsJoueurOrange) {
+            if (pointsJoueurBleu + pointsJoueurOrange <= 1) {
+                System.out.println("La partie s'est achevée avant son terme.");
+            } else if (pointsJoueurBleu > pointsJoueurOrange) {
                 System.out.println("Le joueur bleu a gagné la partie 2 à 0.");
             } else if (pointsJoueurBleu == pointsJoueurOrange) {
                 System.out.println("La partie se termine par un match nul 1-1.");
@@ -376,4 +374,3 @@ public class ICWars extends AreaGame {
         END;
     }
 }
-// IA à faire.

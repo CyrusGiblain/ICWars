@@ -96,12 +96,9 @@ public class Attack extends Action {
 
     @Override
     public void doAutoAction(float dt, ICWarsPlayer player, Unit attackedUnit) {
-        Unit currentUnit = player.getSelectedUnit();
-        DiscreteCoordinates coords = new DiscreteCoordinates((int) attackedUnit.getPosition().x, (int) attackedUnit.getPosition().y);
-        //normal that attackedUnit isn't initialzied, need to get it from the ArrayList
-        //nouveauxHP(currentUnit, attackedUnit);
+
         if (attackedUnit.isDead()) {
-            currentUnit.changePosition(coords);
+            attackedUnit.leaveArea();
         }
         attackedUnit.setIsUsed(true);
         ICWarsPlayer.ICWarsPlayerCurrentState currentState;

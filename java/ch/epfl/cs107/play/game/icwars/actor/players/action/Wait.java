@@ -42,6 +42,5 @@ public class Wait extends Action {
 
     @Override
     public void doAutoAction(float dt, ICWarsPlayer player, Unit attackedUnit) {
-        ICWarsPlayer.ICWarsPlayerCurrentState currentState = ICWarsPlayer.ICWarsPlayerCurrentState.NORMAL;
     }
 }

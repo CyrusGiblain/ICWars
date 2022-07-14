@@ -2,148 +2,200 @@ package ch.epfl.cs107.play.game.icwars.actor.players;
 
 
 import ch.epfl.cs107.play.game.areagame.Area;
+import ch.epfl.cs107.play.game.areagame.actor.Interactor;
+import ch.epfl.cs107.play.game.icwars.actor.players.action.Attack;
+import ch.epfl.cs107.play.game.icwars.actor.players.action.Wait;
 import ch.epfl.cs107.play.game.icwars.actor.players.unit.Unit;
 import ch.epfl.cs107.play.game.icwars.actor.players.action.Action;
 import ch.epfl.cs107.play.game.icwars.area.ICWarsArea;
+import ch.epfl.cs107.play.game.icwars.area.ICWarsBehavior;
+import ch.epfl.cs107.play.game.icwars.gui.ICWarsPlayerGUI;
 import ch.epfl.cs107.play.math.DiscreteCoordinates;
+import ch.epfl.cs107.play.window.Button;
 import ch.epfl.cs107.play.window.Keyboard;
 
-import java.util.ArrayList;
+import java.util.*;
 
 import static ch.epfl.cs107.play.game.icwars.actor.players.ICWarsPlayer.ICWarsPlayerCurrentState.*;
 
-public class AIPlayer extends ICWarsPlayer {
+public class AIPlayer extends ICWarsPlayer implements Interactor {
+
+    private float hp;
+    //private Sprite sprite;
+    //private String spriteName;
+    private ICWarsPlayerGUI icWarsPlayerGUI;
+    // Animation duration in frame number
+    //to Change before rendu
+    private final static int MOVE_DURATION = 3;
+    private ICWarsArea area;
+    private Action action;
+    private ICWarsBehavior.ICWarsCellType cellType;
+
     private ArrayList<Unit> Enemyunits = new ArrayList<>();
     private ArrayList<Unit> AIControlledunits = new ArrayList<>();
     Keyboard keyboard = getOwnerArea().getKeyboard();
     private faction camp;
+    DiscreteCoordinates coordUniteIA = new DiscreteCoordinates(10, 10);
 
     public AIPlayer(ICWarsArea area, DiscreteCoordinates position, faction camp, Unit... units) {
+
         super(area, position, camp, units);
-        this.camp = camp;
-        for(int i = 0; i < area.units.size(); ++i){
-            if(area.units.get(i).getCamp() == camp) AIControlledunits.add(area.units.get(i));
-            else {Enemyunits.add(area.units.get(i));}
-        }
+        this.area = area;
+        this.icWarsPlayerGUI = new ICWarsPlayerGUI(10.0f, this);
+        resetMotion();
+
     }
 
     @Override
-    public void update(float deltatime){
+    public void update(float deltatime) {
         Action act;
         super.update(deltatime);
+
+        Keyboard keyboard = getOwnerArea().getKeyboard();
+
+        Button tab = keyboard.get(Keyboard.TAB);
+        Button enter = keyboard.get(Keyboard.ENTER);
+
         switch (currentState) {
 
             case IDLE:
-                currentState = ICWarsPlayerCurrentState.NORMAL;
+
                 break;
 
             case NORMAL:
 
                 centerCamera();
 
-                currentState = MOVE_UNIT;
+                if (enter.isReleased()) {
+                    currentState = MOVE_UNIT;
+                }
+                if (tab.isReleased()) {
+                    currentState = ICWarsPlayerCurrentState.IDLE;
+                }
+
                 break;
 
 
             case MOVE_UNIT:
-                movement();
-                //this.theSelectedUnitHasBeenUsed = selectedUnit.theUnitHasBeenUsed();
-                currentState = ICWarsPlayerCurrentState.NORMAL;
+
+                for (Unit unit : this.getUnits()) {
+                    action = new Attack(unit, area);
+                    movementAction(unit, action);
+                    break;
+                }
+                currentState = NORMAL;
                 break;
         }
     }
 
-    public void movement() {
-        ArrayList<Double> Distances = new ArrayList<>();
-        ArrayList<Double> xDistances = new ArrayList<>();
-        ArrayList<Double> yDistances = new ArrayList<>();
-        ArrayList<Unit> unitsInRange = new ArrayList<>();
-        int position;
-        Unit AICurrentlyControlledunit = null;
-        Unit smallestHp;
-        //action might not happen because act is not initialized
-        Action act = null;
-        double smallestDistance = 0;
-        //determination of the closes unit to the current one
-        // if not work use other method from DiscreteCoordinates
-        for (int j = 0; j < AIControlledunits.size(); ++j) {
-            for (int i = 0; i < Enemyunits.size(); ++i) {
-                Unit AIControlledunit = AIControlledunits.get(j);
-                Unit Enemyunit = Enemyunits.get(i);
-                Enemyunit.centerCamera();
-                waitFor(1, 4);
-                double xDistance = Math.abs(AIControlledunit.getPosition().x - Enemyunit.getPosition().x);
-                double yDistance = Math.abs(AIControlledunit.getPosition().y - Enemyunit.getPosition().y);
-                xDistances.add(xDistance);
-                yDistances.add(yDistance);
-                Distances.add(Math.sqrt(xDistance * xDistance - yDistance * yDistance));
-                AIControlledunit.centerCamera();
-                waitFor(1,4);
-            }
-            waitFor(2, 24);
-            position = smallestDistance(Distances);
-            AICurrentlyControlledunit = AIControlledunits.get(j);
-            for(int l = 0; l< Distances.size(); ++l) {
-                //if(Distances.get(l) < Math.sqrt(2 * AICurrentlyControlledunit.radius * AICurrentlyControlledunit.radius))
-                unitsInRange.add(Enemyunits.get(l));
-            }
-            smallestHp = findSmallestHp(unitsInRange);
-            // if there are unitsInRange
-            if (unitsInRange != null){
-                //Calculate the distance and move the units to the right place
-                double xDistance = Math.abs(AICurrentlyControlledunit.getPosition().x - smallestHp.getPosition().x);
-                double yDistance = Math.abs(AICurrentlyControlledunit.getPosition().y - smallestHp.getPosition().y);
-                //if (xDistance <= AICurrentlyControlledunit.radius && yDistance <= AICurrentlyControlledunit.radius) {
-                DiscreteCoordinates LowLifeEnemyPosition = new DiscreteCoordinates((int) smallestHp.getPosition().x, (int) smallestHp.getPosition().y);
-                act.equals(AICurrentlyControlledunit.getPossibleActions().get(0));
-                waitFor(2, 48);
-                act.doAutoAction(8, this, smallestHp);
-            }
-            //} else {
-            // if the distance is greater we move to the closest Unit
-            double xDistance = Enemyunits.get(position).getPosition().x;
-            double yDistance = Enemyunits.get(position).getPosition().y;
-            DiscreteCoordinates newPosition = new DiscreteCoordinates((int)xDistance, (int)yDistance);
-            AICurrentlyControlledunit.changePosition(newPosition);
-            AICurrentlyControlledunit.centerCamera();
-        }
-    }
-    //}
-    public Unit findSmallestHp(ArrayList<Unit> units) {
-        int j = 0;
-        Unit unitWithSmallestHp = null;
-        //bubble sort
-        for(int i = 0; i < units.size()-1; ++i) {
-            if(units.get(i).getHp() > units.get(i+1).getHp() &&
-                    (unitWithSmallestHp.getHp() > units.get(i+1).getHp())){
-                unitWithSmallestHp = units.get(i+1);
+    public void movementAction(Unit unit, Action action) {
+
+        float x = unit.getPosition().x;
+        float y = unit.getPosition().y;
+
+        List<Unit> enemyUnits = new ArrayList<>();
+
+        for (Unit unit1 : area.units) {
+            if ((unit1.getCamp() != unit.getCamp()) && !unit1.isDead()) {
+                enemyUnits.add(unit1);
             }
         }
-        return unitWithSmallestHp;
+
+        Unit unitLaPlusProche = unitLaPlusProche(enemyUnits, unit);
+
+        int d = (int) x;
+        int e = (int) y;
+
+        if (unitLaPlusProche.getPosition().x - unit.getPosition().x > unit.getRadius()) {
+            x = x + unit.getRadius();
+        } else if (unitLaPlusProche.getPosition().x - unit.getPosition().x < - unit.getRadius()) {
+            x = x - unit.getRadius();
+        } else if (unitLaPlusProche.getPosition().x - unit.getPosition().x < unit.getRadius() &&
+                unitLaPlusProche.getPosition().x - unit.getPosition().x > 0) {
+            x = x + unitLaPlusProche.getPosition().x - unit.getPosition().x - 1;
+        } else if (unitLaPlusProche.getPosition().x - unit.getPosition().x == 0 &&
+                unitLaPlusProche.getPosition().y - unit.getPosition().y != 0) {
+        } else if (unitLaPlusProche.getPosition().x - unit.getPosition().x == unit.getRadius()) {
+            x = x + unit.getRadius() - 1;
+        } else if (unitLaPlusProche.getPosition().x - unit.getPosition().x == - unit.getRadius()) {
+            x = x - unit.getRadius() + 1;
+        } else {
+            x = x - Math.abs(unitLaPlusProche.getPosition().x - unit.getPosition().x) + 1;
+        }
+
+        if (unitLaPlusProche.getPosition().y - unit.getPosition().y > unit.getRadius()) {
+            y = y + unit.getRadius();
+        } else if (unitLaPlusProche.getPosition().y - unit.getPosition().y < - unit.getRadius()) {
+            y = y - unit.getRadius();
+        } else if (unitLaPlusProche.getPosition().y - unit.getPosition().y < unit.getRadius() &&
+                unitLaPlusProche.getPosition().y - unit.getPosition().y > 0) {
+            y = y + unitLaPlusProche.getPosition().y - unit.getPosition().y - 1;
+        } else if (unitLaPlusProche.getPosition().y - unit.getPosition().y == 0 &&
+                unitLaPlusProche.getPosition().x - unit.getPosition().x != 0) {
+        } else if (unitLaPlusProche.getPosition().y - unit.getPosition().y == unit.getRadius()) {
+            y = y + unit.getRadius() - 1;
+        } else if (unitLaPlusProche.getPosition().y - unit.getPosition().y == - unit.getRadius()) {
+            y = y - unit.getRadius() + 1;
+        } else {
+            y = y - Math.abs(unitLaPlusProche.getPosition().y - unit.getPosition().y) + 1;
+        }
+
+        int deltaX = (int) (x - d);
+        int deltaY = (int) (y - e);
+
+        if (x != coordUniteIA.x || y != coordUniteIA.y) {
+            unit.changePosition(new DiscreteCoordinates((int) x, (int) y));
+        } else {
+            if (deltaX > 0) y = y + 1;
+            if (deltaY > 0) x = x + 1;
+            if (deltaX < 0) y = y - 1;
+            if (deltaY < 0) x = x - 1;
+            unit.changePosition(new DiscreteCoordinates((int) x, (int) y));
+        }
+        int newX = (int) x;
+        int newY = (int) y;
+        coordUniteIA = new DiscreteCoordinates(newX, newY);
+
+        List<Unit> unitsInRange = getUnitsInRange(unit);
+
+        if (unitsInRange.size() != 0) {
+
+            Unit unitPlusPetite = findSmallestHp(unitsInRange);
+
+            int nouveauxHP = unitPlusPetite.getHp() - unit.getDamage() + unitPlusPetite.getDefenseStars();
+            unitPlusPetite.setHp(unitPlusPetite, nouveauxHP);
+
+            if (unitPlusPetite.isDead()) {
+                unitPlusPetite.leaveArea();
+            }
+            unit.setIsUsed(true);
+            unitPlusPetite.centerCamera();
+            waitFor(5, 5);
+        }
+        currentState = NORMAL;
+
     }
 
-    public int smallestDistance (ArrayList < Double > Distances) {
-        // the aim of this method is to go and get the index of the smallest distance, of the distance in the list
-        double smallDistance = 0;
-        int index = 0;
-        //get the smallest distance
-        int j = 0;
-        for (int c = 0; c < Distances.size(); ++c) {
-            if (Distances.get(j) > Distances.get(c)) {
-                smallDistance = Distances.get(c);
-                index = c;
-                j = index;
-            }
+    public Unit findSmallestHp(List<Unit> units) {
+
+        Unit unit = units.get(0);
+
+        for (int i = 1; i < units.size(); ++i) {
+            if (units.get(i).getHp() < unit.getHp())
+                unit = units.get(i);
         }
-        return index;
+
+        return unit;
     }
+
     /**
      * Ensures that value time elapsed before returning true
-     * @param dt elapsed time
+     *
+     * @param dt    elapsed time
      * @param value waiting time (in seconds)
      * @return true if value seconds has elapsed , false otherwise
      */
-    private boolean waitFor(float value , float dt) {
+    private boolean waitFor(float value, float dt) {
         int counter = 0;
         boolean counting = false;
         if (counting) {
@@ -160,4 +212,36 @@ public class AIPlayer extends ICWarsPlayer {
     }
 
 
+    private Unit unitLaPlusProche(List<Unit> enemyUnits, Unit unit) {
+
+        Unit unitLaPlusProche = null;
+
+        float distanceMinimale = 20;
+
+        for (Unit unit2 : enemyUnits) {
+            if (Math.abs(unit2.getPosition().x - unit.getPosition().x) +
+                    Math.abs(unit2.getPosition().y - unit.getPosition().y) < distanceMinimale) {
+                distanceMinimale = Math.abs(unit2.getPosition().x - unit.getPosition().x) +
+                        Math.abs(unit2.getPosition().y - unit.getPosition().y);
+                unitLaPlusProche = unit2;
+            }
+        }
+        return unitLaPlusProche;
+    }
+
+    public List<Unit> getUnitsInRange(Unit selectedUnit) {
+        List<Unit> listOfEnemyUnitsInRange = new ArrayList<>();
+        for (int i = 0; i < area.units.size(); ++i) {
+            Unit unit = area.units.get(i);
+            DiscreteCoordinates coords = new DiscreteCoordinates((int) unit.getPosition().x, (int) unit.getPosition().y);
+            if (selectedUnit.getRange().nodeExists(coords) &&
+                    selectedUnit.getCamp() != unit.getCamp()
+                    && !unit.isDead()) {
+                listOfEnemyUnitsInRange.add(unit);
+            }
+        }
+        return listOfEnemyUnitsInRange;
+    }
 }
+// Wait for à faire.
+// Action à effectuer.

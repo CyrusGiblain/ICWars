@@ -114,6 +114,10 @@ public class ICWarsPlayer extends ICWarsActor implements Interactor {
      */
     @Override
     public void interactWith(Interactable other) {
+        ICWarsPlayerInteractionHandler handler = new ICWarsPlayerInteractionHandler();
+        if (!isDisplacementOccurs()) {
+            other.acceptInteraction(handler);
+        }
     }
 
     // The enumeration that gives the current state of the ICWarsPlayer
@@ -170,6 +174,44 @@ public class ICWarsPlayer extends ICWarsActor implements Interactor {
         return units.size() == 0;
     }
 
+    /**
+     * @return the unit the ICWarsPlayer selected
+     */
+    public Unit getSelectedUnit() {
+        return selectedUnit;
+    }
+
+    /**
+     * @return the ICWarsPlayer current state
+     */
+    public ICWarsPlayerCurrentState getCurrentState() {
+        return currentState;
+    }
+
+    /**
+     * Method to set the current position of the ICWarsPlayer
+     *
+     * @param coords (DiscreteCoordinates): The coordinates we want to the ICWarsPlayer to be set at
+     */
+    public void setCurrentPosition(DiscreteCoordinates coords) {
+        this.coords = coords;
+    }
+
+    /**
+     * @return the units of the ICWarsPlayer
+     */
+    public List<Unit> getUnits() {
+        return units;
+    }
+
+    /**
+     * @param currentState (ICWarsPlayerCurrentState): The state we want the ICWarsPlayer to be set at
+     */
+    public void setCurrentState(ICWarsPlayerCurrentState currentState){
+        this.currentState = currentState;
+    }
+
+
     //4 methods of Interactable
     /**
      * Indicate if the current Interactable take the whole cell space or not
@@ -215,41 +257,21 @@ public class ICWarsPlayer extends ICWarsActor implements Interactor {
         }
     }
 
-    /**
-     * @return the unit the ICWarsPlayer selected
-     */
-    public Unit getSelectedUnit() {
-        return selectedUnit;
+    public faction getCamp() {
+        return camp;
     }
 
-    /**
-     * @return the ICWarsPlayer current state
-     */
-    public ICWarsPlayerCurrentState getCurrentState() {
-        return currentState;
-    }
+    // The handler class
+    private class ICWarsPlayerInteractionHandler implements ICWarsInteractionVisitor {
+        @Override
+        public void interactWith(Unit unit) {
+            //icWarsPlayerGUI.setCellUnit(unit);
+            if (getCamp().equals(unit.getCamp()) && currentState == ICWarsPlayerCurrentState.SELECT_CELL) {
+                selectedUnit = unit;
+                //icWarsPlayerGUI.setUnit(unit);
+                currentState = ICWarsPlayerCurrentState.MOVE_UNIT;
+            }
 
-    /**
-     * Method to set the current position of the ICWarsPlayer
-     *
-     * @param coords (DiscreteCoordinates): The coordinates we want to the ICWarsPlayer to be set at
-     */
-    public void setCurrentPosition(DiscreteCoordinates coords) {
-        this.coords = coords;
+        }
     }
-
-    /**
-     * @return the units of the ICWarsPlayer
-     */
-    public List<Unit> getUnits() {
-        return units;
-    }
-
-    /**
-     * @param currentState (ICWarsPlayerCurrentState): The state we want the ICWarsPlayer to be set at
-     */
-    public void setCurrentState(ICWarsPlayerCurrentState currentState){
-        this.currentState = currentState;
-    }
-
 }

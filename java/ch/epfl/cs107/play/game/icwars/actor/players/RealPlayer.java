@@ -229,7 +229,7 @@ public class RealPlayer extends ICWarsPlayer implements Interactable {
 
     @Override
     public void interactWith(Interactable other) {
-        ICWarsPlayerInteractionHandler handler = new ICWarsPlayerInteractionHandler();
+        ICWarsRealPlayerInteractionHandler handler = new ICWarsRealPlayerInteractionHandler();
         if (!isDisplacementOccurs()) {
             other.acceptInteraction(handler);
         }
@@ -274,7 +274,7 @@ public class RealPlayer extends ICWarsPlayer implements Interactable {
 
 
     // The handler class
-    private class ICWarsPlayerInteractionHandler implements ICWarsInteractionVisitor {
+    private class ICWarsRealPlayerInteractionHandler implements ICWarsInteractionVisitor {
         @Override
         public void interactWith(Unit unit) {
             icWarsPlayerGUI.setCellUnit(unit);
@@ -291,20 +291,12 @@ public class RealPlayer extends ICWarsPlayer implements Interactable {
             cellType = cell.getType();
             icWarsPlayerGUI.setCellUnit(null);
 
-
         }
     }
 
     @Override
     public ICWarsPlayerCurrentState getCurrentState(){
         return currentState;
-    }
-
-    /**
-     * @return the cell type
-     */
-    public ICWarsCellType getCellType(){
-        return cellType;
     }
 
     @Override
@@ -315,6 +307,10 @@ public class RealPlayer extends ICWarsPlayer implements Interactable {
     @Override
     public void acceptInteraction(AreaInteractionVisitor v) {
         ((ICWarsInteractionVisitor)v).interactWith(this);
+    }
+
+    public ICWarsCellType getCellType(){
+        return cellType;
     }
 }
 
