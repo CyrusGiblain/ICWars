@@ -117,7 +117,7 @@ public abstract class Unit extends ICWarsActor implements Interactable, Interact
     /**
      * @return true if the unit is dead
      */
-    public boolean isDead(){return this.getHp() == 0;}
+    public boolean isDead(){return this.getHp() <= 0;}
 
     public int receiveDamage(int hp, int damage){return hp - damage;}
 

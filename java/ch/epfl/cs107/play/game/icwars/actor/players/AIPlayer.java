@@ -20,21 +20,9 @@ import static ch.epfl.cs107.play.game.icwars.actor.players.ICWarsPlayer.ICWarsPl
 
 public class AIPlayer extends ICWarsPlayer implements Interactor {
 
-    private float hp;
-    //private Sprite sprite;
-    //private String spriteName;
-    private ICWarsPlayerGUI icWarsPlayerGUI;
-    // Animation duration in frame number
-    //to Change before rendu
-    private final static int MOVE_DURATION = 3;
     private ICWarsArea area;
     private Action action;
-    private ICWarsBehavior.ICWarsCellType cellType;
-
-    private ArrayList<Unit> Enemyunits = new ArrayList<>();
-    private ArrayList<Unit> AIControlledunits = new ArrayList<>();
-    Keyboard keyboard = getOwnerArea().getKeyboard();
-    private faction camp;
+    ICWarsPlayerGUI icWarsPlayerGUI;
     DiscreteCoordinates coordUniteIA = new DiscreteCoordinates(10, 10);
 
     public AIPlayer(ICWarsArea area, DiscreteCoordinates position, faction camp, Unit... units) {
@@ -66,12 +54,8 @@ public class AIPlayer extends ICWarsPlayer implements Interactor {
 
                 centerCamera();
 
-                if (enter.isReleased()) {
-                    currentState = MOVE_UNIT;
-                }
-                if (tab.isReleased()) {
-                    currentState = ICWarsPlayerCurrentState.IDLE;
-                }
+                //Wait à ajouter.
+                currentState = MOVE_UNIT;
 
                 break;
 
@@ -81,9 +65,8 @@ public class AIPlayer extends ICWarsPlayer implements Interactor {
                 for (Unit unit : this.getUnits()) {
                     action = new Attack(unit, area);
                     movementAction(unit, action);
-                    break;
                 }
-                currentState = NORMAL;
+                currentState = IDLE;
                 break;
         }
     }
@@ -96,6 +79,8 @@ public class AIPlayer extends ICWarsPlayer implements Interactor {
         List<Unit> enemyUnits = new ArrayList<>();
 
         for (Unit unit1 : area.units) {
+            System.out.println("Unit is dead ? : " + !unit1.isDead());
+            System.out.println("camp ? :" + (unit1.getCamp() != unit.getCamp()));
             if ((unit1.getCamp() != unit.getCamp()) && !unit1.isDead()) {
                 enemyUnits.add(unit1);
             }
@@ -103,77 +88,77 @@ public class AIPlayer extends ICWarsPlayer implements Interactor {
 
         Unit unitLaPlusProche = unitLaPlusProche(enemyUnits, unit);
 
-        int d = (int) x;
-        int e = (int) y;
+        if (unitLaPlusProche != null) {
+            int d = (int) x;
+            int e = (int) y;
 
-        if (unitLaPlusProche.getPosition().x - unit.getPosition().x > unit.getRadius()) {
-            x = x + unit.getRadius();
-        } else if (unitLaPlusProche.getPosition().x - unit.getPosition().x < - unit.getRadius()) {
-            x = x - unit.getRadius();
-        } else if (unitLaPlusProche.getPosition().x - unit.getPosition().x < unit.getRadius() &&
-                unitLaPlusProche.getPosition().x - unit.getPosition().x > 0) {
-            x = x + unitLaPlusProche.getPosition().x - unit.getPosition().x - 1;
-        } else if (unitLaPlusProche.getPosition().x - unit.getPosition().x == 0 &&
-                unitLaPlusProche.getPosition().y - unit.getPosition().y != 0) {
-        } else if (unitLaPlusProche.getPosition().x - unit.getPosition().x == unit.getRadius()) {
-            x = x + unit.getRadius() - 1;
-        } else if (unitLaPlusProche.getPosition().x - unit.getPosition().x == - unit.getRadius()) {
-            x = x - unit.getRadius() + 1;
-        } else {
-            x = x - Math.abs(unitLaPlusProche.getPosition().x - unit.getPosition().x) + 1;
-        }
-
-        if (unitLaPlusProche.getPosition().y - unit.getPosition().y > unit.getRadius()) {
-            y = y + unit.getRadius();
-        } else if (unitLaPlusProche.getPosition().y - unit.getPosition().y < - unit.getRadius()) {
-            y = y - unit.getRadius();
-        } else if (unitLaPlusProche.getPosition().y - unit.getPosition().y < unit.getRadius() &&
-                unitLaPlusProche.getPosition().y - unit.getPosition().y > 0) {
-            y = y + unitLaPlusProche.getPosition().y - unit.getPosition().y - 1;
-        } else if (unitLaPlusProche.getPosition().y - unit.getPosition().y == 0 &&
-                unitLaPlusProche.getPosition().x - unit.getPosition().x != 0) {
-        } else if (unitLaPlusProche.getPosition().y - unit.getPosition().y == unit.getRadius()) {
-            y = y + unit.getRadius() - 1;
-        } else if (unitLaPlusProche.getPosition().y - unit.getPosition().y == - unit.getRadius()) {
-            y = y - unit.getRadius() + 1;
-        } else {
-            y = y - Math.abs(unitLaPlusProche.getPosition().y - unit.getPosition().y) + 1;
-        }
-
-        int deltaX = (int) (x - d);
-        int deltaY = (int) (y - e);
-
-        if (x != coordUniteIA.x || y != coordUniteIA.y) {
-            unit.changePosition(new DiscreteCoordinates((int) x, (int) y));
-        } else {
-            if (deltaX > 0) y = y + 1;
-            if (deltaY > 0) x = x + 1;
-            if (deltaX < 0) y = y - 1;
-            if (deltaY < 0) x = x - 1;
-            unit.changePosition(new DiscreteCoordinates((int) x, (int) y));
-        }
-        int newX = (int) x;
-        int newY = (int) y;
-        coordUniteIA = new DiscreteCoordinates(newX, newY);
-
-        List<Unit> unitsInRange = getUnitsInRange(unit);
-
-        if (unitsInRange.size() != 0) {
-
-            Unit unitPlusPetite = findSmallestHp(unitsInRange);
-
-            int nouveauxHP = unitPlusPetite.getHp() - unit.getDamage() + unitPlusPetite.getDefenseStars();
-            unitPlusPetite.setHp(unitPlusPetite, nouveauxHP);
-
-            if (unitPlusPetite.isDead()) {
-                unitPlusPetite.leaveArea();
+            // condition sur uniteLaPlus proche qui doit être differente de null
+            if (unitLaPlusProche.getPosition().x - unit.getPosition().x > unit.getRadius()) {
+                x = x + unit.getRadius();
+            } else if (unitLaPlusProche.getPosition().x - unit.getPosition().x < -unit.getRadius()) {
+                x = x - unit.getRadius();
+            } else if (unitLaPlusProche.getPosition().x - unit.getPosition().x < unit.getRadius() &&
+                    unitLaPlusProche.getPosition().x - unit.getPosition().x > 0) {
+                x = x + unitLaPlusProche.getPosition().x - unit.getPosition().x - 1;
+            } else if (unitLaPlusProche.getPosition().x - unit.getPosition().x == 0 &&
+                    unitLaPlusProche.getPosition().y - unit.getPosition().y != 0) {
+            } else if (unitLaPlusProche.getPosition().x - unit.getPosition().x == unit.getRadius()) {
+                x = x + unit.getRadius() - 1;
+            } else if (unitLaPlusProche.getPosition().x - unit.getPosition().x == -unit.getRadius()) {
+                x = x - unit.getRadius() + 1;
+            } else {
+                x = x - Math.abs(unitLaPlusProche.getPosition().x - unit.getPosition().x) + 1;
             }
-            unit.setIsUsed(true);
-            unitPlusPetite.centerCamera();
-            waitFor(5, 5);
-        }
-        currentState = NORMAL;
 
+            if (unitLaPlusProche.getPosition().y - unit.getPosition().y > unit.getRadius()) {
+                y = y + unit.getRadius();
+            } else if (unitLaPlusProche.getPosition().y - unit.getPosition().y < -unit.getRadius()) {
+                y = y - unit.getRadius();
+            } else if (unitLaPlusProche.getPosition().y - unit.getPosition().y < unit.getRadius() &&
+                    unitLaPlusProche.getPosition().y - unit.getPosition().y > 0) {
+                y = y + unitLaPlusProche.getPosition().y - unit.getPosition().y - 1;
+            } else if (unitLaPlusProche.getPosition().y - unit.getPosition().y == 0 &&
+                    unitLaPlusProche.getPosition().x - unit.getPosition().x != 0) {
+            } else if (unitLaPlusProche.getPosition().y - unit.getPosition().y == unit.getRadius()) {
+                y = y + unit.getRadius() - 1;
+            } else if (unitLaPlusProche.getPosition().y - unit.getPosition().y == -unit.getRadius()) {
+                y = y - unit.getRadius() + 1;
+            } else {
+                y = y - Math.abs(unitLaPlusProche.getPosition().y - unit.getPosition().y) + 1;
+            }
+
+            int deltaX = (int) (x - d);
+            int deltaY = (int) (y - e);
+
+            if (x != coordUniteIA.x || y != coordUniteIA.y) {
+                unit.changePosition(new DiscreteCoordinates((int) x, (int) y));
+            } else {
+                if (deltaX > 0) y = y + 1;
+                if (deltaY > 0) x = x + 1;
+                if (deltaX < 0) y = y - 1;
+                if (deltaY < 0) x = x - 1;
+                unit.changePosition(new DiscreteCoordinates((int) x, (int) y));
+            }
+            int newX = (int) x;
+            int newY = (int) y;
+            coordUniteIA = new DiscreteCoordinates(newX, newY);
+
+            List<Unit> unitsInRange = getUnitsInRange(unit);
+
+            if (unitsInRange.size() != 0) {
+
+                Unit unitPlusPetite = findSmallestHp(unitsInRange);
+
+                int nouveauxHP = unitPlusPetite.getHp() - unit.getDamage() + unitPlusPetite.getDefenseStars();
+                unitPlusPetite.setHp(unitPlusPetite, nouveauxHP);
+
+                if (unitPlusPetite.isDead()) {
+                    unitPlusPetite.leaveArea();
+                }
+                unit.setIsUsed(true);
+                //waitFor(5, 5);
+            }
+        }
     }
 
     public Unit findSmallestHp(List<Unit> units) {
@@ -218,12 +203,15 @@ public class AIPlayer extends ICWarsPlayer implements Interactor {
 
         float distanceMinimale = 20;
 
-        for (Unit unit2 : enemyUnits) {
-            if (Math.abs(unit2.getPosition().x - unit.getPosition().x) +
-                    Math.abs(unit2.getPosition().y - unit.getPosition().y) < distanceMinimale) {
-                distanceMinimale = Math.abs(unit2.getPosition().x - unit.getPosition().x) +
-                        Math.abs(unit2.getPosition().y - unit.getPosition().y);
-                unitLaPlusProche = unit2;
+        if (enemyUnits.size() != 0) {
+
+            for (Unit unit2 : enemyUnits) {
+                if (Math.abs(unit2.getPosition().x - unit.getPosition().x) +
+                        Math.abs(unit2.getPosition().y - unit.getPosition().y) < distanceMinimale) {
+                    distanceMinimale = Math.abs(unit2.getPosition().x - unit.getPosition().x) +
+                            Math.abs(unit2.getPosition().y - unit.getPosition().y);
+                    unitLaPlusProche = unit2;
+                }
             }
         }
         return unitLaPlusProche;
