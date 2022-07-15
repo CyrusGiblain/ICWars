@@ -37,16 +37,15 @@ public class ICWarsPlayerGUI implements Graphics {
      */
     @Override
     public void draw(Canvas canvas) {
-        //System.out.println("player.getCurrentCells : " + player.getCurrentCells());
+
         DiscreteCoordinates destination = player.getCurrentCells().get(0);
-        //System.out.println("destination : " + destination);
 
         Unit selectedUnit = player.getSelectedUnit();
         if(selectedUnit != null && !selectedUnit.theUnitHasBeenUsed() &&
         player.getCurrentState() == ICWarsPlayer.ICWarsPlayerCurrentState.MOVE_UNIT)
             selectedUnit.drawRangeAndPathTo(destination, canvas);
 
-        infoPanel.setCurrentCell(((RealPlayer)player).getCellType());
+        infoPanel.setCurrentCell((((RealPlayer)player).getCellType()));
 
         if (player.getCurrentState() == ICWarsPlayer.ICWarsPlayerCurrentState.NORMAL ||
                 player.getCurrentState() == ICWarsPlayer.ICWarsPlayerCurrentState.SELECT_CELL) {

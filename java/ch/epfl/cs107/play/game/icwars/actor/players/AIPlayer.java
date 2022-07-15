@@ -12,6 +12,7 @@ import ch.epfl.cs107.play.game.icwars.area.ICWarsBehavior;
 import ch.epfl.cs107.play.game.icwars.gui.ICWarsPlayerGUI;
 import ch.epfl.cs107.play.math.DiscreteCoordinates;
 import ch.epfl.cs107.play.window.Button;
+import ch.epfl.cs107.play.window.Canvas;
 import ch.epfl.cs107.play.window.Keyboard;
 
 import java.util.*;
@@ -25,28 +26,45 @@ public class AIPlayer extends ICWarsPlayer implements Interactor {
     ICWarsPlayerGUI icWarsPlayerGUI;
     DiscreteCoordinates coordUniteIA = new DiscreteCoordinates(10, 10);
 
+    private int counter = 0;
+    private boolean counting = false;
+
+    Unit hisSelectedUnit;
+
+    List<Unit> autreUnits;
+
+    int nombre = 0;
+
+    boolean plusDennemis = false;
+
     public AIPlayer(ICWarsArea area, DiscreteCoordinates position, faction camp, Unit... units) {
 
         super(area, position, camp, units);
         this.area = area;
         this.icWarsPlayerGUI = new ICWarsPlayerGUI(10.0f, this);
+        autreUnits = new ArrayList<>();
+        autreUnits.addAll(this.getUnits());
         resetMotion();
+
 
     }
 
     @Override
     public void update(float deltatime) {
-        Action act;
+
         super.update(deltatime);
 
         Keyboard keyboard = getOwnerArea().getKeyboard();
 
-        Button tab = keyboard.get(Keyboard.TAB);
-        Button enter = keyboard.get(Keyboard.ENTER);
+        System.out.println("Autres units : " + autreUnits.size());
+
+        System.out.println(currentState);
 
         switch (currentState) {
 
             case IDLE:
+
+                //plusDennemis = false;
 
                 break;
 
@@ -54,37 +72,93 @@ public class AIPlayer extends ICWarsPlayer implements Interactor {
 
                 centerCamera();
 
-                //Wait à ajouter.
-                currentState = MOVE_UNIT;
+                currentState = SELECT_CELL;
 
                 break;
 
+            case SELECT_CELL:
+
+                if (waitFor(50, 1)) {
+
+                    if (autreUnits.size() != 0) {
+                        Unit unitSelec = autreUnits.get(0);
+                        if (!unitSelec.isDead()) {
+                            this.hisSelectedUnit = unitSelec;
+                            autreUnits.remove(0);
+                            if (autreUnits.size() == 0) {
+                                System.out.println("LÀ");
+                            }
+                            currentState = MOVE_UNIT;
+                            nombre++;
+                            System.out.println(nombre);
+                        }
+
+                    } else {
+                        currentState = IDLE;
+                        autreUnits.addAll(this.getUnits());
+                    }
+
+                    if (plusDennemis) {
+                        currentState = IDLE;
+                    }
+                    counting = false;
+                    counter = 0;
+                }
+
+                break;
 
             case MOVE_UNIT:
 
-                for (Unit unit : this.getUnits()) {
-                    action = new Attack(unit, area);
-                    movementAction(unit, action);
+                movement(this.hisSelectedUnit);
+
+                currentState = ACTION;
+                break;
+
+            case ACTION:
+
+                if (waitFor(50, 1)) {
+
+                        action = new Attack(this.hisSelectedUnit, area);
+
+                        float dt = 0;
+
+                        List<Unit> unitsInRange = getUnitsInRange(this.hisSelectedUnit);
+
+                        if (unitsInRange.size() != 0) {
+                            Unit unitPlusPetite = findSmallestHp(unitsInRange);
+                            action.doAutoAction(dt, this, unitPlusPetite, this.hisSelectedUnit);
+                            currentState = SELECT_CELL;
+                        } else {
+                            currentState = IDLE;
+                        }
+
+                    counter = 0;
+                    counting = false;
                 }
-                currentState = IDLE;
                 break;
         }
     }
 
-    public void movementAction(Unit unit, Action action) {
+    public void movement(Unit unit) {
 
         float x = unit.getPosition().x;
         float y = unit.getPosition().y;
 
+        DiscreteCoordinates c = new DiscreteCoordinates((int) x, (int) y);
+        this.changePosition(c);
+        this.centerCamera();
+
         List<Unit> enemyUnits = new ArrayList<>();
 
         for (Unit unit1 : area.units) {
-            System.out.println("Unit is dead ? : " + !unit1.isDead());
-            System.out.println("camp ? :" + (unit1.getCamp() != unit.getCamp()));
             if ((unit1.getCamp() != unit.getCamp()) && !unit1.isDead()) {
                 enemyUnits.add(unit1);
             }
         }
+
+        /*if (enemyUnits.size() == 0) {
+            plusDennemis = true;
+        }*/
 
         Unit unitLaPlusProche = unitLaPlusProche(enemyUnits, unit);
 
@@ -92,7 +166,6 @@ public class AIPlayer extends ICWarsPlayer implements Interactor {
             int d = (int) x;
             int e = (int) y;
 
-            // condition sur uniteLaPlus proche qui doit être differente de null
             if (unitLaPlusProche.getPosition().x - unit.getPosition().x > unit.getRadius()) {
                 x = x + unit.getRadius();
             } else if (unitLaPlusProche.getPosition().x - unit.getPosition().x < -unit.getRadius()) {
@@ -132,32 +205,22 @@ public class AIPlayer extends ICWarsPlayer implements Interactor {
 
             if (x != coordUniteIA.x || y != coordUniteIA.y) {
                 unit.changePosition(new DiscreteCoordinates((int) x, (int) y));
+                /*this.changePosition(new DiscreteCoordinates((int) unit.getPosition().x,
+                        (int) unit.getPosition().y));
+                centerCamera();*/
             } else {
                 if (deltaX > 0) y = y + 1;
                 if (deltaY > 0) x = x + 1;
                 if (deltaX < 0) y = y - 1;
                 if (deltaY < 0) x = x - 1;
                 unit.changePosition(new DiscreteCoordinates((int) x, (int) y));
+                /*this.changePosition(new DiscreteCoordinates((int) unit.getPosition().x,
+                        (int) unit.getPosition().y));
+                centerCamera();*/
             }
             int newX = (int) x;
             int newY = (int) y;
             coordUniteIA = new DiscreteCoordinates(newX, newY);
-
-            List<Unit> unitsInRange = getUnitsInRange(unit);
-
-            if (unitsInRange.size() != 0) {
-
-                Unit unitPlusPetite = findSmallestHp(unitsInRange);
-
-                int nouveauxHP = unitPlusPetite.getHp() - unit.getDamage() + unitPlusPetite.getDefenseStars();
-                unitPlusPetite.setHp(unitPlusPetite, nouveauxHP);
-
-                if (unitPlusPetite.isDead()) {
-                    unitPlusPetite.leaveArea();
-                }
-                unit.setIsUsed(true);
-                //waitFor(5, 5);
-            }
         }
     }
 
@@ -169,7 +232,6 @@ public class AIPlayer extends ICWarsPlayer implements Interactor {
             if (units.get(i).getHp() < unit.getHp())
                 unit = units.get(i);
         }
-
         return unit;
     }
 
@@ -181,12 +243,12 @@ public class AIPlayer extends ICWarsPlayer implements Interactor {
      * @return true if value seconds has elapsed , false otherwise
      */
     private boolean waitFor(float value, float dt) {
-        int counter = 0;
-        boolean counting = false;
+
         if (counting) {
             counter += dt;
             if (counter > value) {
                 counting = false;
+                counter = 0;
                 return true;
             }
         } else {
@@ -230,6 +292,19 @@ public class AIPlayer extends ICWarsPlayer implements Interactor {
         }
         return listOfEnemyUnitsInRange;
     }
+    @Override
+    public void draw(Canvas canvas) {
+
+        super.draw(canvas);
+
+        //icWarsPlayerGUI.draw(canvas);
+
+        if(currentState == ICWarsPlayerCurrentState.ACTION && action != null) {
+            action.draw(canvas);
+        }
+    }
 }
-// Wait for à faire.
-// Action à effectuer.
+
+// Le AIPlayer ne suit pas ses unités.
+// Draw le curseur.
+// Encore un probleme pour eliminer une unite.

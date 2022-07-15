@@ -95,15 +95,15 @@ public class Attack extends Action {
     }
 
     @Override
-    public void doAutoAction(float dt, ICWarsPlayer player, Unit attackedUnit) {
+    public void doAutoAction(float dt, ICWarsPlayer player, Unit attackedUnit, Unit attackingUnit) {
+
+        int nouveauxHP = attackedUnit.getHp() - unit.getDamage() + attackedUnit.getDefenseStars();
+        attackedUnit.setHp(attackedUnit, nouveauxHP);
 
         if (attackedUnit.isDead()) {
             attackedUnit.leaveArea();
         }
-        attackedUnit.setIsUsed(true);
-        ICWarsPlayer.ICWarsPlayerCurrentState currentState;
-        currentState = ICWarsPlayer.ICWarsPlayerCurrentState.NORMAL;
-        attackedUnit.centerCamera();
+        unit.setIsUsed(true);
     }
 
     @Override

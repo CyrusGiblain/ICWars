@@ -110,7 +110,6 @@ abstract public class AreaGame implements Game, PauseMenu.Pausable {
         return true;
     }
 
-
     @Override
     public void update(float deltaTime) {
 

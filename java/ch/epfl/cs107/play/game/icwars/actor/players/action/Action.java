@@ -20,6 +20,6 @@ public abstract class Action implements Graphics {
     public abstract void draw(Canvas canvas);
     public abstract void doAction(float dt, ICWarsPlayer player, Keyboard keyboard);
     public abstract String getName();
-    public abstract void doAutoAction(float dt, ICWarsPlayer player, Unit attackedUnit);
+    public abstract void doAutoAction(float dt, ICWarsPlayer player, Unit attackedUnit, Unit attackingUnit);
     public int getActionKey(){return actionKey;}
 }
