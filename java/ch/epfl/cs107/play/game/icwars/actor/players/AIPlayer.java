@@ -54,17 +54,13 @@ public class AIPlayer extends ICWarsPlayer implements Interactor {
 
         super.update(deltatime);
 
-        Keyboard keyboard = getOwnerArea().getKeyboard();
-
-        System.out.println("Autres units : " + autreUnits.size());
-
-        System.out.println(currentState);
-
         switch (currentState) {
 
             case IDLE:
 
-                //plusDennemis = false;
+                if (autreUnits.size() != 0) {
+                    autreUnits.clear();
+                }
 
                 break;
 
@@ -73,6 +69,8 @@ public class AIPlayer extends ICWarsPlayer implements Interactor {
                 centerCamera();
 
                 currentState = SELECT_CELL;
+
+                autreUnits.addAll(this.getUnits());
 
                 break;
 
@@ -129,7 +127,9 @@ public class AIPlayer extends ICWarsPlayer implements Interactor {
                             action.doAutoAction(dt, this, unitPlusPetite, this.hisSelectedUnit);
                             currentState = SELECT_CELL;
                         } else {
+                            hisSelectedUnit.setIsUsed(true);
                             currentState = IDLE;
+
                         }
 
                     counter = 0;
@@ -204,8 +204,8 @@ public class AIPlayer extends ICWarsPlayer implements Interactor {
             int deltaY = (int) (y - e);
 
             if (x != coordUniteIA.x || y != coordUniteIA.y) {
-                unit.changePosition(new DiscreteCoordinates((int) x, (int) y));
-                /*this.changePosition(new DiscreteCoordinates((int) unit.getPosition().x,
+                /*unit.changePosition(new DiscreteCoordinates((int) x, (int) y));
+                this.changePosition(new DiscreteCoordinates((int) unit.getPosition().x,
                         (int) unit.getPosition().y));
                 centerCamera();*/
             } else {
@@ -213,8 +213,8 @@ public class AIPlayer extends ICWarsPlayer implements Interactor {
                 if (deltaY > 0) x = x + 1;
                 if (deltaX < 0) y = y - 1;
                 if (deltaY < 0) x = x - 1;
-                unit.changePosition(new DiscreteCoordinates((int) x, (int) y));
-                /*this.changePosition(new DiscreteCoordinates((int) unit.getPosition().x,
+                /*unit.changePosition(new DiscreteCoordinates((int) x, (int) y));
+                this.changePosition(new DiscreteCoordinates((int) unit.getPosition().x,
                         (int) unit.getPosition().y));
                 centerCamera();*/
             }
@@ -306,5 +306,5 @@ public class AIPlayer extends ICWarsPlayer implements Interactor {
 }
 
 // Le AIPlayer ne suit pas ses unités.
-// Draw le curseur.
-// Encore un probleme pour eliminer une unite.
+// Draw le curseur ?
+//Probleme de draw du soldier (unite marquée comme nulle) dans la console
