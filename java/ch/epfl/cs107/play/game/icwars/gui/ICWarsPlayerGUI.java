@@ -45,7 +45,9 @@ public class ICWarsPlayerGUI implements Graphics {
         player.getCurrentState() == ICWarsPlayer.ICWarsPlayerCurrentState.MOVE_UNIT)
             selectedUnit.drawRangeAndPathTo(destination, canvas);
 
-        infoPanel.setCurrentCell((((RealPlayer)player).getCellType()));
+        if (player instanceof RealPlayer) {
+            infoPanel.setCurrentCell((((RealPlayer) player).getCellType()));
+        }
 
         if (player.getCurrentState() == ICWarsPlayer.ICWarsPlayerCurrentState.NORMAL ||
                 player.getCurrentState() == ICWarsPlayer.ICWarsPlayerCurrentState.SELECT_CELL) {

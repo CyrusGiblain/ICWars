@@ -33,9 +33,8 @@ public class AIPlayer extends ICWarsPlayer implements Interactor {
 
     List<Unit> autreUnits;
 
-    int nombre = 0;
 
-    boolean plusDennemis = false;
+
 
     public AIPlayer(ICWarsArea area, DiscreteCoordinates position, faction camp, Unit... units) {
 
@@ -45,8 +44,6 @@ public class AIPlayer extends ICWarsPlayer implements Interactor {
         autreUnits = new ArrayList<>();
         autreUnits.addAll(this.getUnits());
         resetMotion();
-
-
     }
 
     @Override
@@ -76,33 +73,23 @@ public class AIPlayer extends ICWarsPlayer implements Interactor {
 
             case SELECT_CELL:
 
-                if (waitFor(50, 1)) {
+                if (waitFor(15, 1)) {
 
                     if (autreUnits.size() != 0) {
                         Unit unitSelec = autreUnits.get(0);
                         if (!unitSelec.isDead()) {
                             this.hisSelectedUnit = unitSelec;
                             autreUnits.remove(0);
-                            if (autreUnits.size() == 0) {
-                                System.out.println("LÀ");
-                            }
                             currentState = MOVE_UNIT;
-                            nombre++;
-                            System.out.println(nombre);
                         }
 
                     } else {
                         currentState = IDLE;
                         autreUnits.addAll(this.getUnits());
                     }
-
-                    if (plusDennemis) {
-                        currentState = IDLE;
-                    }
                     counting = false;
                     counter = 0;
                 }
-
                 break;
 
             case MOVE_UNIT:
@@ -114,7 +101,7 @@ public class AIPlayer extends ICWarsPlayer implements Interactor {
 
             case ACTION:
 
-                if (waitFor(50, 1)) {
+                if (waitFor(15, 1)) {
 
                         action = new Attack(this.hisSelectedUnit, area);
 
@@ -155,10 +142,6 @@ public class AIPlayer extends ICWarsPlayer implements Interactor {
                 enemyUnits.add(unit1);
             }
         }
-
-        /*if (enemyUnits.size() == 0) {
-            plusDennemis = true;
-        }*/
 
         Unit unitLaPlusProche = unitLaPlusProche(enemyUnits, unit);
 
@@ -204,20 +187,21 @@ public class AIPlayer extends ICWarsPlayer implements Interactor {
             int deltaY = (int) (y - e);
 
             if (x != coordUniteIA.x || y != coordUniteIA.y) {
-                /*unit.changePosition(new DiscreteCoordinates((int) x, (int) y));
-                this.changePosition(new DiscreteCoordinates((int) unit.getPosition().x,
+                unit.changePosition(new DiscreteCoordinates((int) x, (int) y));
+                /*this.changePosition(new DiscreteCoordinates((int) unit.getPosition().x,
                         (int) unit.getPosition().y));
                 centerCamera();*/
-            } else {
+            }
+            /* else {
                 if (deltaX > 0) y = y + 1;
                 if (deltaY > 0) x = x + 1;
                 if (deltaX < 0) y = y - 1;
                 if (deltaY < 0) x = x - 1;
-                /*unit.changePosition(new DiscreteCoordinates((int) x, (int) y));
+                unit.changePosition(new DiscreteCoordinates((int) x, (int) y));
                 this.changePosition(new DiscreteCoordinates((int) unit.getPosition().x,
                         (int) unit.getPosition().y));
-                centerCamera();*/
-            }
+                centerCamera();
+            }*/
             int newX = (int) x;
             int newY = (int) y;
             coordUniteIA = new DiscreteCoordinates(newX, newY);
@@ -297,7 +281,7 @@ public class AIPlayer extends ICWarsPlayer implements Interactor {
 
         super.draw(canvas);
 
-        //icWarsPlayerGUI.draw(canvas);
+        icWarsPlayerGUI.draw(canvas);
 
         if(currentState == ICWarsPlayerCurrentState.ACTION && action != null) {
             action.draw(canvas);

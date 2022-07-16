@@ -53,7 +53,6 @@ public class ICWars extends AreaGame {
 
         Button keyR =  keyboard.get(Keyboard.R);
 
-        // PROBLEME
         if (keyR.isReleased()) {
             listOfPlayers.clear();
             listOfPlayersWaitingForTheCurrentRound.clear();
