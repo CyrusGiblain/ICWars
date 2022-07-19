@@ -205,7 +205,7 @@ public class ICWars extends AreaGame {
 
         DiscreteCoordinates coordsALLY = area.getPlayerSpawnPosition();
 
-        DiscreteCoordinates coordsOfTheTankOfTheFirstRealPlayer = new DiscreteCoordinates(8, 6);
+        DiscreteCoordinates coordsOfTheTankOfTheFirstRealPlayer = new DiscreteCoordinates(0, 0);
         DiscreteCoordinates coordsOfTheSoldatOfTheFirstRealPlayer = new DiscreteCoordinates(0, 2);
 
         Tanks tankFirstPlayer = new Tanks(area, coordsOfTheTankOfTheFirstRealPlayer, ALLIE);

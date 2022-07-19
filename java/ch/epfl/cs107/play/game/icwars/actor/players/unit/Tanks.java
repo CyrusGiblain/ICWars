@@ -72,7 +72,11 @@ public class Tanks extends Unit{
             if (camp == ALLIE) tankAllie.draw(canvas);
             if (camp == ENNEMI1) tankEnnemi.draw(canvas);
             if (camp == ENNEMI2) tankEnnemi2.draw(canvas);
-            unit.setAlpha(0.5f);
+            if (unit !=null) {
+                unit.setAlpha(0.5f);
+            } else {
+                unit.setAlpha(0.5f);
+            }
         }
     }
 

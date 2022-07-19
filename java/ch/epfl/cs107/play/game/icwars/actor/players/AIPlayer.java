@@ -33,6 +33,10 @@ public class AIPlayer extends ICWarsPlayer implements Interactor {
 
     List<Unit> autreUnits;
 
+    int nombreDeMouvementIA = 0;
+
+    int nombreDeMovement = 0;
+
 
 
 
@@ -51,6 +55,8 @@ public class AIPlayer extends ICWarsPlayer implements Interactor {
 
         super.update(deltatime);
 
+        System.out.println(currentState);
+
         switch (currentState) {
 
             case IDLE:
@@ -58,6 +64,8 @@ public class AIPlayer extends ICWarsPlayer implements Interactor {
                 if (autreUnits.size() != 0) {
                     autreUnits.clear();
                 }
+
+                nombreDeMouvementIA = 0;
 
                 break;
 
@@ -73,7 +81,7 @@ public class AIPlayer extends ICWarsPlayer implements Interactor {
 
             case SELECT_CELL:
 
-                if (waitFor(15, 1)) {
+                if (waitFor(50, 1)) {
 
                     if (autreUnits.size() != 0) {
                         Unit unitSelec = autreUnits.get(0);
@@ -94,30 +102,53 @@ public class AIPlayer extends ICWarsPlayer implements Interactor {
 
             case MOVE_UNIT:
 
-                movement(this.hisSelectedUnit);
+                if (nombreDeMouvementIA == 0) {
+                    movement(this.hisSelectedUnit);
+                    nombreDeMovement++;
+                    currentState = ACTION;
+                } else {
+                    currentState = SELECT_CELL;
+                }
 
-                currentState = ACTION;
                 break;
 
             case ACTION:
 
-                if (waitFor(15, 1)) {
+                if (waitFor(50, 1)) {
+
+                    List<Unit> unitsInRange = getUnitsInRange(this.hisSelectedUnit);
+                    float dt = 0;
+
+                    if (nombreDeMouvementIA == 0) {
 
                         action = new Attack(this.hisSelectedUnit, area);
-
-                        float dt = 0;
-
-                        List<Unit> unitsInRange = getUnitsInRange(this.hisSelectedUnit);
 
                         if (unitsInRange.size() != 0) {
                             Unit unitPlusPetite = findSmallestHp(unitsInRange);
                             action.doAutoAction(dt, this, unitPlusPetite, this.hisSelectedUnit);
-                            currentState = SELECT_CELL;
+                            System.out.println("A");
+                            this.currentState = SELECT_CELL;
+
                         } else {
                             hisSelectedUnit.setIsUsed(true);
+                            System.out.println("B");
                             currentState = IDLE;
-
                         }
+
+                        nombreDeMouvementIA++;
+
+                    } else {
+
+                        if (unitsInRange.size() != 0) {
+                            System.out.println("C");
+                            currentState = SELECT_CELL;
+                        } else {
+
+                            hisSelectedUnit.setIsUsed(true);
+                            System.out.println("D");
+                            currentState = IDLE;
+                        }
+                    }
 
                     counter = 0;
                     counting = false;
@@ -187,21 +218,24 @@ public class AIPlayer extends ICWarsPlayer implements Interactor {
             int deltaY = (int) (y - e);
 
             if (x != coordUniteIA.x || y != coordUniteIA.y) {
-                unit.changePosition(new DiscreteCoordinates((int) x, (int) y));
-                /*this.changePosition(new DiscreteCoordinates((int) unit.getPosition().x,
-                        (int) unit.getPosition().y));
-                centerCamera();*/
-            }
-            /* else {
-                if (deltaX > 0) y = y + 1;
-                if (deltaY > 0) x = x + 1;
-                if (deltaX < 0) y = y - 1;
-                if (deltaY < 0) x = x - 1;
+
                 unit.changePosition(new DiscreteCoordinates((int) x, (int) y));
                 this.changePosition(new DiscreteCoordinates((int) unit.getPosition().x,
                         (int) unit.getPosition().y));
                 centerCamera();
-            }*/
+            }
+             else {
+                if (deltaX > 0) y = y + 1;
+                if (deltaY > 0) x = x + 1;
+                if (deltaX < 0) y = y - 1;
+                if (deltaY < 0) x = x - 1;
+
+                unit.changePosition(new DiscreteCoordinates((int) x, (int) y));
+                this.changePosition(new DiscreteCoordinates((int) unit.getPosition().x,
+                        (int) unit.getPosition().y));
+
+                centerCamera();
+            }
             int newX = (int) x;
             int newY = (int) y;
             coordUniteIA = new DiscreteCoordinates(newX, newY);
@@ -236,7 +270,7 @@ public class AIPlayer extends ICWarsPlayer implements Interactor {
                 return true;
             }
         } else {
-            counter = (int) 0f;
+            counter = 0;
             counting = true;
         }
         return false;
@@ -287,6 +321,11 @@ public class AIPlayer extends ICWarsPlayer implements Interactor {
             action.draw(canvas);
         }
     }
+
+    /*@Override
+    public boolean changePosition(DiscreteCoordinates newPosition) {
+        this.getPosition();
+    }*/
 }
 
 // Le AIPlayer ne suit pas ses unités.

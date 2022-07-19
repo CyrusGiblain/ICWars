@@ -85,7 +85,11 @@ public class Soldats extends Unit {
             if (camp == ALLIE) soldatAllie.draw(canvas);
             if (camp == ENNEMI1) soldatEnnemi.draw(canvas);
             if (camp == ENNEMI2) soldatEnnemi2.draw(canvas);
-            unit.setAlpha(0.5f);
+            if (unit != null) {
+                unit.setAlpha(0.5f);
+            } else {
+                unit.setAlpha(0.5f);
+            }
         }
     }
 
