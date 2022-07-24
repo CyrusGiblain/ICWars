@@ -75,7 +75,9 @@ public class Tanks extends Unit{
             if (unit !=null) {
                 unit.setAlpha(0.5f);
             } else {
-                unit.setAlpha(0.5f);
+                if (unit != null) {
+                    unit.setAlpha(0.5f);
+                }
             }
         }
     }

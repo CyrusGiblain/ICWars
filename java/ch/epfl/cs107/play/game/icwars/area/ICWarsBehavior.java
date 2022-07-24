@@ -174,7 +174,7 @@ public class ICWarsBehavior extends AreaBehavior{
             if (entity.takeCellSpace()) {
                 for (Interactable otherEntity : entities) {
                     if (otherEntity.takeCellSpace()) {
-                        System.out.println("TAKE CELL SPACE");
+                        //System.out.println("TAKE CELL SPACE");
                         return false;
                     }
                 }

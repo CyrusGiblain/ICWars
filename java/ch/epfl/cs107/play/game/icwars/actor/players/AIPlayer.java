@@ -277,5 +277,3 @@ public class AIPlayer extends ICWarsPlayer implements Interactor {
         }
     }
 }
-
-//Probleme de draw du soldier (unite marquée comme nulle) dans la console
