@@ -33,13 +33,6 @@ public class AIPlayer extends ICWarsPlayer implements Interactor {
 
     List<Unit> autreUnits;
 
-    int nombreDeMouvementIA = 0;
-
-    int nombreDeMovement = 0;
-
-
-
-
     public AIPlayer(ICWarsArea area, DiscreteCoordinates position, faction camp, Unit... units) {
 
         super(area, position, camp, units);
@@ -48,14 +41,13 @@ public class AIPlayer extends ICWarsPlayer implements Interactor {
         autreUnits = new ArrayList<>();
         autreUnits.addAll(this.getUnits());
         resetMotion();
+        sprite.setAlpha(0f);
     }
 
     @Override
     public void update(float deltatime) {
 
         super.update(deltatime);
-
-        System.out.println(currentState);
 
         switch (currentState) {
 
@@ -64,14 +56,9 @@ public class AIPlayer extends ICWarsPlayer implements Interactor {
                 if (autreUnits.size() != 0) {
                     autreUnits.clear();
                 }
-
-                nombreDeMouvementIA = 0;
-
                 break;
 
             case NORMAL:
-
-                centerCamera();
 
                 currentState = SELECT_CELL;
 
@@ -102,13 +89,9 @@ public class AIPlayer extends ICWarsPlayer implements Interactor {
 
             case MOVE_UNIT:
 
-                if (nombreDeMouvementIA == 0) {
-                    movement(this.hisSelectedUnit);
-                    nombreDeMovement++;
-                    currentState = ACTION;
-                } else {
-                    currentState = SELECT_CELL;
-                }
+                movement(this.hisSelectedUnit);
+                getOwnerArea().setViewCandidate(hisSelectedUnit);
+                currentState = ACTION;
 
                 break;
 
@@ -119,35 +102,16 @@ public class AIPlayer extends ICWarsPlayer implements Interactor {
                     List<Unit> unitsInRange = getUnitsInRange(this.hisSelectedUnit);
                     float dt = 0;
 
-                    if (nombreDeMouvementIA == 0) {
+                    action = new Attack(this.hisSelectedUnit, area);
 
-                        action = new Attack(this.hisSelectedUnit, area);
-
-                        if (unitsInRange.size() != 0) {
-                            Unit unitPlusPetite = findSmallestHp(unitsInRange);
-                            action.doAutoAction(dt, this, unitPlusPetite, this.hisSelectedUnit);
-                            System.out.println("A");
-                            this.currentState = SELECT_CELL;
-
-                        } else {
-                            hisSelectedUnit.setIsUsed(true);
-                            System.out.println("B");
-                            currentState = IDLE;
-                        }
-
-                        nombreDeMouvementIA++;
+                    if (unitsInRange.size() != 0) {
+                        Unit unitPlusPetite = findSmallestHp(unitsInRange);
+                        action.doAutoAction(dt, this, unitPlusPetite, this.hisSelectedUnit);
+                        this.currentState = SELECT_CELL;
 
                     } else {
-
-                        if (unitsInRange.size() != 0) {
-                            System.out.println("C");
-                            currentState = SELECT_CELL;
-                        } else {
-
-                            hisSelectedUnit.setIsUsed(true);
-                            System.out.println("D");
-                            currentState = IDLE;
-                        }
+                        hisSelectedUnit.setIsUsed(true);
+                        currentState = IDLE;
                     }
 
                     counter = 0;
@@ -157,14 +121,10 @@ public class AIPlayer extends ICWarsPlayer implements Interactor {
         }
     }
 
-    public void movement(Unit unit) {
+    public DiscreteCoordinates movement(Unit unit) {
 
         float x = unit.getPosition().x;
         float y = unit.getPosition().y;
-
-        DiscreteCoordinates c = new DiscreteCoordinates((int) x, (int) y);
-        this.changePosition(c);
-        this.centerCamera();
 
         List<Unit> enemyUnits = new ArrayList<>();
 
@@ -218,28 +178,23 @@ public class AIPlayer extends ICWarsPlayer implements Interactor {
             int deltaY = (int) (y - e);
 
             if (x != coordUniteIA.x || y != coordUniteIA.y) {
-
                 unit.changePosition(new DiscreteCoordinates((int) x, (int) y));
-                this.changePosition(new DiscreteCoordinates((int) unit.getPosition().x,
-                        (int) unit.getPosition().y));
-                centerCamera();
             }
              else {
+
                 if (deltaX > 0) y = y + 1;
                 if (deltaY > 0) x = x + 1;
                 if (deltaX < 0) y = y - 1;
                 if (deltaY < 0) x = x - 1;
 
                 unit.changePosition(new DiscreteCoordinates((int) x, (int) y));
-                this.changePosition(new DiscreteCoordinates((int) unit.getPosition().x,
-                        (int) unit.getPosition().y));
-
-                centerCamera();
             }
             int newX = (int) x;
             int newY = (int) y;
             coordUniteIA = new DiscreteCoordinates(newX, newY);
+
         }
+        return new DiscreteCoordinates((int) x, (int) y);
     }
 
     public Unit findSmallestHp(List<Unit> units) {
@@ -321,13 +276,6 @@ public class AIPlayer extends ICWarsPlayer implements Interactor {
             action.draw(canvas);
         }
     }
-
-    /*@Override
-    public boolean changePosition(DiscreteCoordinates newPosition) {
-        this.getPosition();
-    }*/
 }
 
-// Le AIPlayer ne suit pas ses unités.
-// Draw le curseur ?
 //Probleme de draw du soldier (unite marquée comme nulle) dans la console
